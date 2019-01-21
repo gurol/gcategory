@@ -1015,24 +1015,23 @@ loadTestData <- function() {
   xr1 <<- floor(runif(11, 1, 11))
   yr1 <<- floor(runif(11, 10, 110))
   
-  # Sample space size (m):  1,260  5,555  23,743  1,929  4,725
-  # Feature space size (n):    65     94     105     78    111
+  # Sample space size (m):  1,260  5,555  23,743  1,929  4,725  2,421
+  # Feature space size (n):    65     94     105     78    111  85
   
-  # DSMs <<- paste0(rep('DS', 5), 1:5)
-  DSMs <<- c('AMGP', 'Drebin', 'AMD', 'ABot', 'VT2018')
-  nMalware <<- c(65, 94, 105, 78, 111)
-  mMalware <<- c(1260, 5555, 23743, 1929, 4725)
+  DSMs <<- c('AMGP', 'Drebin', 'AMD', 'ABot', 'VT2018', 'UpDroid')
+  nMalware <<- c(65, 94, 105, 78, 111, 85)
+  mMalware <<- c(1260, 5555, 23743, 1929, 4725, 2421)
 }
 
 testPlot <- function(power_1=1, power_2=0) {
   # x1 and y1
-  # dss <- paste0(rep('DS', length(x1)), 1:length(x1))
-  # plotGCategoriesZScores(x1, y1, dss, power=power_1)
-  # invisible(readline(prompt=paste('x1 vs. y1 (Arithmetic)',
-  #                                 'Press [enter] to continue')))
-  # plotGCategoriesZScores(x1, y1, dss, power=power_2)
-  # invisible(readline(prompt=paste('x1 vs. y1 (Geometric)',
-  #                                 'Press [enter] to continue')))
+  dss <- paste0(rep('DS', length(x1)), 1:length(x1))
+  plotGCategoriesZScores(x1, y1, dss, power=power_1)
+  invisible(readline(prompt=paste('x1 vs. y1 (Arithmetic)',
+                                  'Press [enter] to continue')))
+  plotGCategoriesZScores(x1, y1, dss, power=power_2)
+  invisible(readline(prompt=paste('x1 vs. y1 (Geometric)',
+                                  'Press [enter] to continue')))
   
   # xr1 and yr1
   dss <- paste0(rep('DS', length(xr1)), 1:length(xr1))
@@ -1058,6 +1057,14 @@ testPlot <- function(power_1=1, power_2=0) {
   invisible(readline(prompt=paste('nP vs. mP (Arithmetic)',
                                   'Press [enter] to continue')))
   plotGCategoriesZScores(nP, mP, dss, power=power_2)
+  invisible(readline(prompt=paste('nP vs. mP (Geometric)',
+                                  'Press [enter] to continue')))
+  
+  # nMalware and mMalware
+  plotGCategoriesZScores(nMalware, mMalware, DSMs, power=power_1)
+  invisible(readline(prompt=paste('nP vs. mP (Arithmetic)',
+                                  'Press [enter] to continue')))
+  plotGCategoriesZScores(nMalware, mMalware, DSMs, power=power_2)
   invisible(readline(prompt=paste('nP vs. mP (Geometric)',
                                   'Press [enter] to continue')))
 }
