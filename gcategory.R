@@ -49,21 +49,18 @@ library(ggplot2)
 
 # G-category: indexes
 gc_small <- 1
-gc_skinny <- 2
+gc_average <- 2
 gc_shallow <- 3
-gc_average <- 4
+gc_skinny <- 4
 gc_large <- 5
 gc_na <- 6
 
 # G-category: Names
-names_gc <- c('small', 'skinny', 'shallow', 'average', 'large', 'NA')
-names_gc_TR <- c('küçük', 'sıska', 'sığ', 'vasat', 'geniş', 'U/D')
+names_gc <- c('small', 'average', 'shallow', 'skinny', 'large', 'NA')
+names_gc_TR <- c('küçük', 'vasat', 'sığ', 'sıska', 'geniş', 'U/D')
 # G-category: Colors
-#             Small      Skinny     Shallow    Average    Large      NA
-cols_gc <- c('#FC9ACF', '#BC9AFC', '#9ABEFC', '#FCB09A', '#D1FD9B', 'pink')
-
-# Alpha threshold
-gc_alpha <- 0.05
+#             Small      Average    Shallow    Skinny     Large      NA
+cols_gc <- c('#FC9ACF', '#FCB09A', '#9ABEFC', '#BC9AFC', '#D1FD9B', 'pink')
 
 #' Power: mean types proposed by Gürol Canbek:
 #' Copyright (C) 2017-2018 Gürol Canbek
@@ -409,121 +406,6 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
     else {
       stopifnot(FALSE)
       gc_type <- gc_na
-    }
-  }
-  else {
-    gc_type <- gc_na
-  }
-  
-  return (gcs[gc_type])
-}
-
-greatnessCategoryOld <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
-                                 power_statistics_x=NULL,
-                                 power_statistics_y=NULL,
-                                 gcs=names_gc)
-{
-  if (is.na(x[i]))
-    return ('NA')
-  
-  if (TRUE == is.null(power_statistics_x)) {
-    power_statistics_x <- powerStatistics(x, power=power, na.rm=na.rm)
-  }
-  z_score_x <- powerZScore(i, x, power=power, na.rm=na.rm,
-                           power_statistics=power_statistics_x)
-  
-  if (TRUE == is.null(power_statistics_y)) {
-    power_statistics_y <- powerStatistics(y, power=power, na.rm=na.rm)
-  }
-  z_score_y <- powerZScore(i, y, power=power, na.rm=na.rm,
-                           power_statistics=power_statistics_y)
-  
-  theta_min <- theta - gc_alpha
-  theta_max <- theta + gc_alpha
-  
-  if (power == 0) {
-    # Geometric
-    if (is.na(z_score_x) || is.na(z_score_y)) {
-      gc_type <- gc_na
-    }
-    else if ((z_score_x >= theta && z_score_x <= theta) ||
-             (z_score_y >= theta && z_score_y <= theta)) {
-      gc_type <- gc_average
-    }
-    else if ((z_score_y > theta && z_score_x >= 2*theta) ||
-             (z_score_y >= 2*theta && z_score_x > theta)) {
-      gc_type <- gc_large
-    }
-    else if (z_score_y > theta && z_score_x > theta) {
-      gc_type <- gc_average
-    }
-    else if (z_score_y < theta^-1 && z_score_x < theta^-1) {
-      gc_type <- gc_small
-    }
-    else if ((z_score_y / z_score_x) > theta) {
-      gc_type <- gc_skinny
-    }
-    else if ((z_score_x / z_score_y) > theta) {
-      gc_type <- gc_shallow
-    }
-  }
-  else if (power > 0 && power <= 1) {
-    if (is.na(z_score_x) || is.na(z_score_y)) {
-      gc_type <- gc_na
-    }
-    # else if ((z_score_y > theta && z_score_x >= 1.25 * theta) ||
-    #   (z_score_y >= 1.25 * theta && z_score_x > theta)) {
-    #   gc_type <- gc_large
-    # }
-    # Test (Bas)
-    else if ((z_score_x >= theta && z_score_x <= theta) ||
-             (z_score_y >= theta && z_score_y <= theta)) {
-      gc_type <- gc_average
-    }
-    else if ((z_score_y > theta && z_score_x >= 0.69 + theta) ||
-             (z_score_y >= 0.69 + theta && z_score_x > theta)) {
-      gc_type <- gc_large
-    }
-    else if (z_score_y > theta && z_score_x > theta) {
-      gc_type <- gc_average
-    }
-    # Test (Son)
-    else if (z_score_y < -theta && z_score_x < -theta) {
-      gc_type <- gc_small
-    }
-    else if ((z_score_y - z_score_x) > theta) {
-      gc_type <- gc_skinny
-    }
-    else if ((z_score_x - z_score_y) > theta) {
-      gc_type <- gc_shallow
-    }
-    else {
-      gc_type <- gc_average
-    }
-  }
-  # Eski yontem
-  else if (power > 0 && power <= 1) {
-    if (is.na(z_score_x) || is.na(z_score_y)) {
-      gc_type <- gc_na
-    }
-    else if ((z_score_x >= theta_min && z_score_x <= theta_max) ||
-             (z_score_y >= theta_min && z_score_y <= theta_max)) {
-      gc_type <- gc_average
-    }
-    else if (z_score_y > theta && z_score_x > theta) {
-      gc_type <- gc_large
-    }
-    else if (z_score_y < -theta && z_score_x < -theta) {
-      gc_type <- gc_small
-    }
-    else if ((z_score_y - z_score_x) > theta) {
-      gc_type <- gc_skinny
-    }
-    else if ((z_score_x - z_score_y) > theta) {
-      gc_type <- gc_shallow
-    }
-    else {
-      gc_type <- gc_average
     }
   }
   else {
