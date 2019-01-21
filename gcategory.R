@@ -49,17 +49,17 @@ library(ggplot2)
 
 # G-category: indexes
 gc_small <- 1
-gc_average <- 2
+gc_medium <- 2
 gc_shallow <- 3
 gc_skinny <- 4
 gc_large <- 5
 gc_na <- 6
 
 # G-category: Names
-names_gc <- c('small', 'average', 'shallow', 'skinny', 'large', 'NA')
+names_gc <- c('small', 'medium', 'shallow', 'skinny', 'large', 'NA')
 names_gc_TR <- c('küçük', 'vasat', 'sığ', 'sıska', 'geniş', 'U/D')
 # G-category: Colors
-#             Small      Average    Shallow    Skinny     Large      NA
+#             Small      Medium    Shallow    Skinny     Large      NA
 cols_gc <- c('#FC9ACF', '#FCB09A', '#9ABEFC', '#BC9AFC', '#D1FD9B', 'pink')
 
 #' Power: mean types proposed by Gürol Canbek:
@@ -361,7 +361,7 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
              ((z_score_x > theta && z_score_x < 2*theta) &&
               (z_score_y > theta && z_score_y < 2*theta))
     ) {
-      gc_type <- gc_average
+      gc_type <- gc_medium
     }
     else if (z_score_y > theta && z_score_x > theta) {
       gc_type <- gc_large
@@ -389,7 +389,7 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
              ((z_score_x > theta_scaled && z_score_x < 2*theta_scaled) &&
               (z_score_y > theta_scaled && z_score_y < 2*theta_scaled))
     ) {
-      gc_type <- gc_average
+      gc_type <- gc_medium
     }
     else if (z_score_x > theta_scaled && z_score_y > theta_scaled) {
       gc_type <- gc_large
@@ -498,8 +498,8 @@ plotGCategoriesZScoresSeperated <- function(x, y, DSs, power=0, round_digit=1,
   cols[inds] <- cols_gc[gc_skinny]
   inds <- which(result_gc == names_gc[gc_shallow], arr.ind=TRUE)
   cols[inds] <- cols_gc[gc_shallow]
-  inds <- which(result_gc == names_gc[gc_average], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_average]
+  inds <- which(result_gc == names_gc[gc_medium], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_medium]
   inds <- which(result_gc == names_gc[gc_large], arr.ind=TRUE)
   cols[inds] <- cols_gc[gc_large]
   
@@ -594,8 +594,8 @@ plotGCategoriesZScores <- function(x, y, DSs,
   cols[inds] <- cols_gc[gc_skinny]
   inds <- which(result_gc == names_gc[gc_shallow], arr.ind=TRUE)
   cols[inds] <- cols_gc[gc_shallow]
-  inds <- which(result_gc == names_gc[gc_average], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_average]
+  inds <- which(result_gc == names_gc[gc_medium], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_medium]
   inds <- which(result_gc == names_gc[gc_large], arr.ind=TRUE)
   cols[inds] <- cols_gc[gc_large]
   
@@ -777,8 +777,8 @@ plotGCategoriesTable <- function(x, y, DSs, power=0,
   cols[inds] <- cols_gc[gc_skinny]
   inds <- which(result_pure == names_gc[gc_shallow], arr.ind=TRUE)
   cols[inds] <- cols_gc[gc_shallow]
-  inds <- which(result_pure == names_gc[gc_average], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_average]
+  inds <- which(result_pure == names_gc[gc_medium], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_medium]
   inds <- which(result_pure == names_gc[gc_large], arr.ind=TRUE)
   cols[inds] <- cols_gc[gc_large]
   
@@ -883,8 +883,8 @@ plotCombinationAll <- function(x, y, power=0, round_digit=1,
   cols[inds] <- cols_gc[gc_skinny]
   inds <- which(result$Gc == names_gc[gc_shallow], arr.ind=T)
   cols[inds] <- cols_gc[gc_shallow]
-  inds <- which(result$Gc == names_gc[gc_average], arr.ind=T)
-  cols[inds] <- cols_gc[gc_average]
+  inds <- which(result$Gc == names_gc[gc_medium], arr.ind=T)
+  cols[inds] <- cols_gc[gc_medium]
   inds <- which(result$Gc == names_gc[gc_large], arr.ind=T)
   cols[inds] <- cols_gc[gc_large]
   
