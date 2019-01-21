@@ -129,7 +129,9 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
       gc_type <- gc_na
     }
     else if ((z_score_x >= theta_min && z_score_x <= theta_max) ||
-      (z_score_y >= theta_min && z_score_y <= theta_max)) {
+             (z_score_y >= theta_min && z_score_y <= theta_max)) {
+    # else if ((z_score_x >= theta && z_score_x <= theta) ||
+    #   (z_score_y >= theta && z_score_y <= theta)) {
       gc_type <- gc_average
     }
     else if ((z_score_y > theta && z_score_x >= 2*theta) ||
@@ -695,4 +697,17 @@ loadTestData <- function() {
   DSMs <<- c('AMGP', 'Drebin', 'AMD', 'ABot', 'VT2018')
   nMalware <<- c(65, 94, 105, 78, 111)
   mMalware <<- c(1260, 5555, 23743, 1929, 4725)
+}
+
+# Arithmetic (1) vs. Pure Geometric (0)
+testPowerMethods <- function(power_1=1, power_2=0) {
+  # x1 and y1
+  DSs <- paste0(rep('DS', length(x1)), 1:length(x1))
+  plotGCategoriesZScores(x1, y1, DSs, power=power_1)
+  invisible(readline(prompt=paste('x1 vs. y1 (Arithmetic)',
+                                  'Press [enter] to continue')))
+  DSs <- paste0(rep('DS', length(x1)), 1:length(x1))
+  plotGCategoriesZScores(x1, y1, DSs, power=power_2)
+  invisible(readline(prompt=paste('x1 vs. y1 (Geometric)',
+                                  'Press [enter] to continue')))
 }
