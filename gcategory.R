@@ -12,12 +12,12 @@
 #' See the license file in <https://github.com/gurol/gcategory>  
 #' 
 #' @author Gürol Canbek, <gurol44@gmail.com>  
-#' @references <http://gurol.canbek.com 
-#' @keywords dataset, data profiling, big data, big dataset, sample space,
-#' feature space, space size, dataset profiling, mean, average,
-#' arithmetic mean, geometric mean, quadratic mean, harmonic mean, power mean,
-#' pythagorean mean, generalized mean, hölder mean, mean of degree,
-#' root-mean square, cube-root mean cube, cubic mean
+#' @references <http://gurol.canbek.com>  
+#' @keywords dataset, data profiling, big data, big dataset, sample space,  
+#' feature space, space size, dataset profiling, mean, average,  
+#' arithmetic mean, geometric mean, quadratic mean, harmonic mean, power mean,  
+#' pythagorean mean, generalized mean, hölder mean, mean of degree,  
+#' root-mean square, cube-root mean cube, cubic mean  
 #' @title G-Category - Dataset Greatness Category
 #' @date 2 January 2019
 #' @version 1.3
@@ -45,6 +45,8 @@ library(gtable) # gtable
 library(scales)
 library(ggplot2)
 
+source('powerstat.R')
+
 # Globals for functions
 
 # G-category: indexes
@@ -56,248 +58,14 @@ gc_large <- 5
 gc_na <- 6
 
 # G-category: Names
-names_gc <- c('small', 'medium', 'shallow', 'skinny', 'large', 'NA')
-names_gc_TR <- c('küçük', 'vasat', 'sığ', 'sıska', 'geniş', 'U/D')
+names_gc <- c('Small', 'Medium', 'Shallow', 'Skinny', 'Large', 'NA')
+names_gc_TR <- c('Küçük', 'Orta', 'Sığ', 'Sıska', 'Geniş', 'U/D')
 # G-category: Colors
 #             Small      Medium    Shallow    Skinny     Large      NA
 cols_gc <- c('#FC9ACF', '#FCB09A', '#9ABEFC', '#BC9AFC', '#D1FD9B', 'pink')
 
 #' Power: mean types proposed by Gürol Canbek:
 #' Copyright (C) 2017-2018 Gürol Canbek
-#
-# -1    : Harmonic mean
-#  0    : Geometric mean (Pure)
-#  0.25 : Geometric mean, Geometric SD, Geometric z-score, Arithmetic categorization
-#  0.75 : Geometric mean, Arithmetic SD, Arithmetic z-score, Arithmetic categorization
-#  1    : Arithmetic mean (Pure)
-#  2    : Mean square
-#  3    : Mean cube
-
-# Example dataset specifications
-# DSs <- paste0(rep('DS', 6), 0:5)
-
-#' Give description of the power types
-#'
-#' This helper function that can be used for other purposes returns the
-#' description of the power types proposed by Gürol Canbek.
-#'
-#' @param power power coefficient (-1: Harmonic; 0: Geometric (pure);
-#' 0.25: Geometric mean, Geometric SD, Geometric z-score, Arithmetic
-#' categorization; 0.75: Geometric mean, Arithmetic SD, Arithmetic z-score,
-#' Arithmetic categorization; 1: Arithmetic mean (Pure); 2: Mean square;
-#' 3: Mean cube)
-#'
-#' @return Power description text
-#'
-#' @example powerMeanTypes(0)
-#' @note Proposed by Gürol Canbek.
-powerMeanTypes<-function(power)
-{
-  if (power < -1) {
-    description <- 'Invalid'
-  }
-  else if (power < 0) {
-    description <- 'Harmonic Mean (Not Implemented)'
-  }
-  else if (power < 1) {
-    if (power == 0) {
-      description <- 'Pure Geometric Approach'
-    }
-    if (power == 0.25) {
-      description <-
-        'Mixed Geometric/Arithmetic Approach '
-      '(Geometric Mean/Z-score, Arithmetic Categorization)'
-    }
-    else if (power == 0.75) {
-      description <-
-        'Mixed Geometric/Arithmetic Approach '
-      '(Geometric Mean, Arithmetic Z-score/Categorization)'
-    }
-  }
-  else if (power == 1) {
-    description <- 'Pure Arithmetic Approach'
-  }
-  else if (power == 2) {
-    description <- 'Mean Square (Not Implemented)'
-  }
-  else if (power == 3) {
-    description <- 'Mean Cube (Not Implemented)'
-  }
-  else {
-    description <- 'Invalid'
-  }
-  
-  description <- paste0(description, ' (Power: ', power, ')')
-  
-  return (description)
-}
-
-#' Calculate power statistics
-#'
-#' This helper function that can be used for other purposes calculates
-#' mean and standard deviation of a vector given based on power type
-#'
-#' @param x a numeric vector
-#' @param power power coefficient (-1: Harmonic; 0: Geometric (pure);
-#' 0.25: Geometric mean, Geometric SD, Geometric z-score, Arithmetic
-#' categorization; 0.75: Geometric mean, Arithmetic SD, Arithmetic z-score,
-#' Arithmetic categorization; 1: Arithmetic mean (Pure); 2: Mean square;
-#' 3: Mean cube) (default: \code{1} for pure arithmetic mean)
-#' @param na.rm NA values are removed before calculations (default: \code{TRUE})
-#'
-#' @return A list with two single values: $mean and $sd (standard deviation)
-#' @export
-#'
-#' @examples
-#' x <- c(1:11)
-#' powerStatistics(x, power=0)
-#' powerStatistics(x, power=1)
-#' @note Proposed by Gürol Canbek.
-powerStatistics <- function(x, power=1, na.rm=TRUE)
-{
-  if (power == -1) {
-    # Harmonic mean: 1/mean(1/x)
-    power_mean <- 1/mean(1/x, na.rm=na.rm)
-    power_sd <- NULL
-  }
-  else if (power == 0 || power == 0.25) {
-    
-    if (na.rm)
-      x <- na.omit(x)
-    
-    # Geometric mean: prod(x)^(1/n)
-    power_mean <- prod(x)^(1/length(x))
-    # Geometric SD: exp(sd(log(x, ...), na.rm = na.rm, ...))
-    power_sd <- exp(sd(log(x)))
-  }
-  else if (power == 0.75) {
-    
-    if (na.rm)
-      x <- na.omit(x)
-    
-    # Geometric mean: prod(x)^(1/n)
-    power_mean <- prod(x)^(1/length(x))
-    
-    # Arithmetic SD (around geometric mean)
-    power_sd <- sqrt(sum((x-power_mean)^2/(length(x)-1)))
-  }
-  else if (power == 1) {
-    # Arithmetic mean: sum(x)/length(x)
-    power_mean <- mean(x, na.rm=na.rm)
-    # Arithmetic SD:
-    power_sd <- sd(x, na.rm=na.rm)
-  }
-  else if (power == 2) {
-    # Mean square: sqrt(mean(x^2))
-    power_mean <- sqrt(mean(x^2, na.rm=na.rm))
-    power_sd <- NULL
-  }
-  else if (power == 3) {
-    # Mean cube: mean(x^3)^(1/3)
-    power_mean <- mean(x^3, na.rm=na.rm)^(1/3)
-    power_sd <- NULL
-  }
-  
-  return(list(mean=power_mean, sd=power_sd))
-}
-
-#' Calculate Z-scores of an element in a vector
-#'
-#' This helper function that can be used for other purposes calculates
-#' Z-scores of an element in a vector given based on power type
-#'
-#' @param i the index of the element in a vector
-#' @param x a numeric vector
-#' @param power power coefficient (-1: Harmonic; 0: Geometric (pure);
-#' 0.25: Geometric mean, Geometric SD, Geometric z-score, Arithmetic
-#' categorization; 0.75: Geometric mean, Arithmetic SD, Arithmetic z-score,
-#' Arithmetic categorization; 1: Arithmetic mean (Pure); 2: Mean square;
-#' 3: Mean cube) (default: \code{1} for pure arithmetic mean)
-#' @param na.rm NA values are removed before calculations (default: \code{TRUE})
-#' @param power_statistics power statistics already calculated (default:
-#' \code{NULL} for not calculated)
-#' @seealso \code{\link{powerStatistics}}
-#'
-#' @return Z-score (single value)
-#' @export
-#'
-#' @examples
-#' x <- c(1:11)
-#' powerZScore(6, x, power=0)
-#' powerZScore(6, x, power=1)
-#' @note Proposed by Gürol Canbek.
-powerZScore <- function(i, x, power=1, na.rm=TRUE, power_statistics=NULL)
-{
-  z_score <- NA
-  
-  if (is.na(x[i]))
-    return (z_score)
-  
-  if (TRUE==is.null(power_statistics)) {
-    # No power-statistics given. Calculate
-    power_statistics <- powerStatistics(x, power=power, na.rm=na.rm)
-  }
-  
-  if (power == -1) {
-    # @todo 
-    # Harmonic z-score
-  }
-  else if (power == 0 || power == 0.25) {
-    # Geometric z-score
-    z_score <- exp((log(x[i]) - log(power_statistics$mean))/
-                     log(power_statistics$sd))
-  }
-  else if (power == 1 || power == 0.75) {
-    # Arithmetic z-score
-    z_score <- (x[i] - power_statistics$mean)/power_statistics$sd
-  }
-  else if (power == 2) {
-    # @todo
-    # Mean square z-score
-  }
-  else if (power == 3) {
-    # @todo
-    # Mean cube z-score
-  }
-  
-  return (z_score)
-}
-
-#' Calculate Z-scores of all elements in a vector
-#'
-#' This helper function that can be used for other purposes calculates
-#' Z-scores of all elements in a vector given based on power type
-#'
-#' @param x a numeric vector
-#' @param power power coefficient (-1: Harmonic; 0: Geometric (pure);
-#' 0.25: Geometric mean, Geometric SD, Geometric z-score, Arithmetic
-#' categorization; 0.75: Geometric mean, Arithmetic SD, Arithmetic z-score,
-#' Arithmetic categorization; 1: Arithmetic mean (Pure); 2: Mean square;
-#' 3: Mean cube) (default: \code{1} for pure arithmetic mean)
-#' @param na.rm NA values are removed before calculations (default: \code{TRUE})
-#' @seealso \code{\link{powerStatistics}} and \code{\link{powerZScore}} for
-#' single element
-#'
-#' @return Z-scores (vector)
-#' @export
-#'
-#' @examples
-#' x <- c(1:11)
-#' powerZScores(x, power=0)
-#' powerZScores(x, power=1)
-#' @note Proposed by Gürol Canbek.
-powerZScores <- function(x, power=1, na.rm=TRUE)
-{
-  # Not to calculate each item
-  power_statistics <- powerStatistics(x, power=power, na.rm=na.rm)
-  z_scores <- lapply(seq_along(x),
-                     function(x, i) powerZScore(
-                       i, x, power=power, na.rm=na.rm,
-                       power_statistics=power_statistics),
-                     x=x)
-  
-  return (unlist(z_scores))
-}
 
 #' Calculate greatness category of a single dataset of which feature and sample
 #' space size vectors based on a novel method called G-Category.
@@ -569,7 +337,7 @@ plotGCategoriesZScoresSeperated <- function(x, y, DSs, power=0, round_digit=1,
                          powerMeanTypes(power)))
 }
 
-plotGCategoriesZScores <- function(x, y, DSs,
+plotGCategoriesZScores <- function(x, y, DSs, info,
                                    power=0, theta=1, round_digit=1,
                                    arrange=TRUE, na.rm=TRUE,
                                    boldDiagonals=FALSE)
@@ -615,23 +383,23 @@ plotGCategoriesZScores <- function(x, y, DSs,
     interpret <- ''
     
     if (power == 0) {
-      interpret <- paste(
-        round(zsc_y[ind]/zsc_x[ind], round_digit), '(',
-        round(sqrt(zsc_y[ind]*zsc_x[ind]), round_digit), ')')
+      interpret <- paste0(
+        '√(Zn*Zm)=', round(sqrt(zsc_y[ind]*zsc_x[ind]), round_digit), ' (Zm/Zn=',
+        round(zsc_y[ind]/zsc_x[ind], round_digit), ')')
     }
     else if (power > 0 && power <= 1) {
-      interpret <- paste(
-        round(zsc_y[ind] - zsc_x[ind], round_digit), '(',
-        round((zsc_y[ind] + zsc_x[ind])/2.0, round_digit), ')')
+      interpret <- paste0(
+        '(Zn+Zm)/2=', round((zsc_y[ind] + zsc_x[ind])/2.0, round_digit), ' (Zm-Zn=',
+        round(zsc_y[ind] - zsc_x[ind], round_digit), ')')
     }
     
     inds <- which(result_ds == ds, arr.ind=TRUE)
     original <- result[inds]
     more_detailed <- paste0(
       original,
-      '\n', x[ind], 'x', y[ind],
-      ' (', zx, 'x', zy,
-      ')\n', interpret
+      '\nnxm=', x[ind], ' x ', y[ind],
+      ' ZnxZm=', zx, ' x ', zy,
+      '\n', interpret
     )
     result[inds] <- more_detailed
   }
@@ -650,8 +418,9 @@ plotGCategoriesZScores <- function(x, y, DSs,
   grid.arrange(grobGC,
                ncol=1, nrow=1,
                top=paste0('Data Sets\' G-Categories via ',
-                          powerMeanTypes(power), '\n',
-                          length(DSs), ' datasets, ',
+                          powerMeanTypes(power), ': ',
+                          info),
+               bottom=paste0(length(DSs), ' datasets, ',
                           'n (', x_name, ') statistics: min=',
                           round(min(zsc_x), 1),
                           ', average=', round(mean(zsc_x), 1),
@@ -661,6 +430,8 @@ plotGCategoriesZScores <- function(x, y, DSs,
                           ', average=', round(mean(zsc_y), 1),
                           ', max=', round(max(zsc_y), 1))
   )
+  
+  return (result)
 }
 
 # Simulation
@@ -868,6 +639,49 @@ tabulateGreatnessCategories <- function(
   return (xy)
 }
 
+plotCombination <- function(x, y, power=0, round_digit=1,
+                            arrange=TRUE, theta=1, na.rm=TRUE,
+                            boldDiagonals=FALSE)
+{
+  result <- greatnesCategoriesCombination(
+    x, y, power=power, arrange=arrange,
+    theta=theta, na.rm=na.rm)
+  
+  cols <- as.table(matrix('white', nrow(result), ncol(result)))
+  
+  inds <- which(result == names_gc[gc_small], arr.ind=T)
+  cols[inds] <- cols_gc[gc_small]
+  inds <- which(result == names_gc[gc_skinny], arr.ind=T)
+  cols[inds] <- cols_gc[gc_skinny]
+  inds <- which(result == names_gc[gc_shallow], arr.ind=T)
+  cols[inds] <- cols_gc[gc_shallow]
+  inds <- which(result == names_gc[gc_medium], arr.ind=T)
+  cols[inds] <- cols_gc[gc_medium]
+  inds <- which(result == names_gc[gc_large], arr.ind=T)
+  cols[inds] <- cols_gc[gc_large]
+  
+  fontfaces <- as.table(matrix('plain', nrow(result), ncol(result)))
+  
+  if (boldDiagonals) {
+    inds <- which(row(result) == col(result), arr.ind=T)
+    fontfaces[inds] <- 'bold'
+  }
+  
+  mytheme <- gridExtra::ttheme_minimal(
+    core = list(fg_params=list(cex=0.6, fontface=fontfaces),
+                bg_params=list(fill=cols)),
+    colhead = list(fg_params=list(cex=0.7)),
+    rowhead = list(fg_params=list(cex=0.7)))
+  
+  grobGC <- tableGrob(result, theme=mytheme)
+  
+  grid.arrange(grobGC,
+               ncol=1, nrow=1,
+               top=paste0('G-Categories of Data Sets with n (', length(x),
+                         ') x ', 'm (', length(y), ') Combinations\nvia ',
+                         powerMeanTypes(power)))
+}
+
 plotCombinationAll <- function(x, y, power=0, round_digit=1,
                                arrange=TRUE, theta=1, na.rm=TRUE,
                                boldDiagonals=FALSE)
@@ -1000,117 +814,4 @@ plotGCategories<-function(x, y, GCs, DSs,
     p
   else
     return(p)
-}
-
-loadTestData <- function() {
-  DSs <<- paste0(rep('DS', 5), 0:4)
-  nN <<- c(84, 94, 83, 99, 118)
-  mN <<- c(264303, 254, 310926, 1000, 207865)
-  nP <<- c(90, 81, 69, 75, 73)
-  mP <<- c(399353, 280, 4868, 1000, 378)
-  
-  DSxy <<- paste0(rep('DS', 11), 0:10)
-  x1 <<- c(1, 2:12, 13)
-  y1 <<- c(10, seq(120, 20, -10), 130)
-  xr1 <<- floor(runif(11, 1, 11))
-  yr1 <<- floor(runif(11, 10, 110))
-  
-  # Sample space size (m):  1,260  5,555  23,743  1,929  4,725  2,421
-  # Feature space size (n):    65     94     105     78    111  85
-  
-  DSMs <<- c('AMGP', 'Drebin', 'AMD', 'ABot', 'VT2018', 'UpDroid')
-  nMalware <<- c(65, 94, 105, 78, 111, 85)
-  mMalware <<- c(1260, 5555, 23743, 1929, 4725, 2421)
-}
-
-testPlot <- function(power_1=1, power_2=0) {
-  # x1 and y1
-  dss <- paste0(rep('DS', length(x1)), 1:length(x1))
-  plotGCategoriesZScores(x1, y1, dss, power=power_1)
-  invisible(readline(prompt=paste('x1 vs. y1 (Arithmetic)',
-                                  'Press [enter] to continue')))
-  plotGCategoriesZScores(x1, y1, dss, power=power_2)
-  invisible(readline(prompt=paste('x1 vs. y1 (Geometric)',
-                                  'Press [enter] to continue')))
-  
-  # xr1 and yr1
-  dss <- paste0(rep('DS', length(xr1)), 1:length(xr1))
-  plotGCategoriesZScores(xr1, yr1, dss, power=power_1)
-  invisible(readline(prompt=paste('xr1 vs. yr1 (Arithmetic)',
-                                  'Press [enter] to continue')))
-  plotGCategoriesZScores(xr1, yr1, dss, power=power_2)
-  invisible(readline(prompt=paste('xr1 vs. yr1 (Geometric)',
-                                  'Press [enter] to continue')))
-  
-  # nN and mN
-  dss <- paste0(rep('DS', length(nN)), 1:length(nN))
-  plotGCategoriesZScores(nN, mN, dss, power=power_1)
-  invisible(readline(prompt=paste('nN vs. mN (Arithmetic)',
-                                  'Press [enter] to continue')))
-  plotGCategoriesZScores(nN, mN, dss, power=power_2)
-  invisible(readline(prompt=paste('nN vs. mN (Geometric)',
-                                  'Press [enter] to continue')))
-  
-  # nP and mP
-  dss <- paste0(rep('DS', length(nP)), 1:length(nP))
-  plotGCategoriesZScores(nP, mP, dss, power=power_1)
-  invisible(readline(prompt=paste('nP vs. mP (Arithmetic)',
-                                  'Press [enter] to continue')))
-  plotGCategoriesZScores(nP, mP, dss, power=power_2)
-  invisible(readline(prompt=paste('nP vs. mP (Geometric)',
-                                  'Press [enter] to continue')))
-  
-  # nMalware and mMalware
-  plotGCategoriesZScores(nMalware, mMalware, DSMs, power=power_1)
-  invisible(readline(prompt=paste('nP vs. mP (Arithmetic)',
-                                  'Press [enter] to continue')))
-  plotGCategoriesZScores(nMalware, mMalware, DSMs, power=power_2)
-  invisible(readline(prompt=paste('nP vs. mP (Geometric)',
-                                  'Press [enter] to continue')))
-}
-
-testDump <- function(power_1=1, power_2=0) {
-  # x1 and y1
-  dss <- paste0(rep('DS', length(x1)), 1:length(x1))
-  result <- dumpGCategoriesZScores(x1, y1, power=power_1)
-  wclip(result)
-  invisible(readline(prompt=paste('x1 vs. y1 (Arithmetic)',
-                                  'Press [enter] to continue')))
-  result <- dumpGCategoriesZScores(x1, y1, power=power_2)
-  wclip(result)
-  invisible(readline(prompt=paste('x1 vs. y1 (Geometric)',
-                                  'Press [enter] to continue')))
-  
-  # xr1 and yr1
-  dss <- paste0(rep('DS', length(xr1)), 1:length(xr1))
-  result <- dumpGCategoriesZScores(xr1, yr1, power=power_1)
-  wclip(result)
-  invisible(readline(prompt=paste('xr1 vs. yr1 (Arithmetic)',
-                                  'Press [enter] to continue')))
-  result <- dumpGCategoriesZScores(xr1, yr1, power=power_2)
-  wclip(result)
-  invisible(readline(prompt=paste('xr1 vs. yr1 (Geometric)',
-                                  'Press [enter] to continue')))
-  
-  # nN and mN
-  dss <- paste0(rep('DS', length(nN)), 1:length(nN))
-  result <- dumpGCategoriesZScores(nN, mN, power=power_1)
-  wclip(result)
-  invisible(readline(prompt=paste('nN vs. mN (Arithmetic)',
-                                  'Press [enter] to continue')))
-  result <- dumpGCategoriesZScores(nN, mN, power=power_2)
-  wclip(result)
-  invisible(readline(prompt=paste('nN vs. mN (Geometric)',
-                                  'Press [enter] to continue')))
-  
-  # nP and mP
-  dss <- paste0(rep('DS', length(nP)), 1:length(nP))
-  result <- dumpGCategoriesZScores(nP, mP, power=power_1)
-  wclip(result)
-  invisible(readline(prompt=paste('nP vs. mP (Arithmetic)',
-                                  'Press [enter] to continue')))
-  result <- dumpGCategoriesZScores(nP, mP, power=power_2)
-  wclip(result)
-  invisible(readline(prompt=paste('nP vs. mP (Geometric)',
-                                  'Press [enter] to continue')))
 }
