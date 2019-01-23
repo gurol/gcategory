@@ -57,12 +57,14 @@ gc_skinny <- 4
 gc_large <- 5
 gc_na <- 6
 
-# G-category: Names
+# G-Category: Names
 names_gc <- c('Small', 'Medium', 'Shallow', 'Skinny', 'Large', 'NA')
 names_gc_TR <- c('Küçük', 'Orta', 'Sığ', 'Sıska', 'Geniş', 'U/D')
-# G-category: Colors
+# G-Category: Colors
 #             Small      Medium    Shallow    Skinny     Large      NA
 cols_gc <- c('#FC9ACF', '#FCB09A', '#9ABEFC', '#BC9AFC', '#D1FD9B', 'pink')
+
+# See plotGCategories for mark shapes for G-Categories
 
 #' Power: mean types proposed by Gürol Canbek:
 #' Copyright (C) 2017-2018 Gürol Canbek
@@ -790,11 +792,13 @@ plotGCategories<-function(x, y, GCs, DSs,
   
   ds_dist <- cbind.data.frame(x, y, GCs, DSs)
   
-  mark_shapes <- c(15, charToRaw('|'), charToRaw('-'), 15, 15, 8)
+  #                1   2   3               4               5   6
+  mark_shapes <- c(15, 15, charToRaw('-'), charToRaw('|'), 15, 8)
   names(mark_shapes) <- names_gc
   mark_colors <- cols_gc
   names(mark_colors) <- names_gc
-  mark_sizes <- c(3, 9, 9, 6, 9, 9)
+  #               1  2  3  4  5  6
+  mark_sizes <- c(3, 6, 9, 9, 9, 9)
   names(mark_sizes) <- names_gc
   
   p <- ggplot(ds_dist, aes(x=x, y=y)) +
