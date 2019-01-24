@@ -9,11 +9,11 @@ infos <- c(
 )
 
 dir_sub <- c(
-  'linear/',
-  'random/',
-  'benign/',
-  'malign/',
-  'malwarefamily/'
+  '1_SyntheticDSs_Linear/',
+  '2_SyntheticDSs_Random/',
+  '3_BenignDSs/',
+  '4_MalignDSs/',
+  '5_MalwareFamilyDSs/'
 )
 
 loadTestData <- function(count_ds=9) {
@@ -63,7 +63,7 @@ processDsConfiguration <- function(n, m, dss, show_ds_info,
   }
   
   # Figure: Data Sets' G-Categories with Z-scores
-  cat(paste0('G-Categories calculated via ', power_method, ifelse(power==0, ' (b: Correct Approach)\n', ' (a: Erroneous Approach)\n')))
+  cat(paste0('G-Categories calculated via ', power_method, ifelse(power==0, ' (correct) approach. See the files having "geo" in names.\n', ' (erroneous) approach. See the files having "ari" in names.\n')))
   
   if (plot_to_file) {
     png(filename=fig_1_name, width=width_1, height=height_1, units='cm', res=300)
@@ -85,9 +85,18 @@ processDsConfiguration <- function(n, m, dss, show_ds_info,
     png(filename=fig_2_name, width=35, height=20, units='cm', res=300)
   }
   
-  print(plotGCategories(n, m,
-                        greatnessCategories(n, m, power=power, theta=theta),
-                        dss, trans=y_transform))
+  print(
+    plotGCategories(
+      n, m,
+      greatnessCategories(n, m, power=power, theta=theta),
+      dss, trans=y_transform,
+      subtitle=paste('G-Categories of the data sets with', info,
+                     '\nCalculated via', powerMeanTypes(power),
+                     ifelse(y_transform == 'log10',
+                            'sample space is drawn in logarithmic scale', '')
+                     )
+    )
+  )
   
   if (plot_to_file) {
     dev.off()
@@ -117,11 +126,11 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          info=infos[conf],
                          n_name='nLin', m_name='mLin',
                          power=power_1, power_method='Arithmetic', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], 'F1a_LinearSizes_Arithmetic.png'),
+                         fig_1_name=paste0(dir_parent, dir_sub[conf], '1ari_aLinearDSSizes.png'),
                          width_1=45, height_1=15,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], 'F1a_LinearSizeGraph_Arithmetic.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], 'F1a_LinearSizeComb_Arithmetic.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], 'T1a_LinearSizes_Arithmetic.csv'),
+                         fig_2_name=paste0(dir_parent, dir_sub[conf], '1ari_bLinearDSSizeGraph.png'),
+                         fig_3_name=paste0(dir_parent, dir_sub[conf], '1ari_cLinearDSSizeCombination.png'),
+                         tab_name=paste0(dir_parent, dir_sub[conf], '1ari_dLinearDSSizes.csv'),
                          plot_to_file=plot_to_file, y_transform='identity'
   )
   
@@ -129,11 +138,11 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          info=infos[conf],
                          n_name='nLin', m_name='mLin',
                          power=power_2, power_method='Geometric', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], 'F1b_LinearSizes_Geometric.png'),
+                         fig_1_name=paste0(dir_parent, dir_sub[conf], '1geo_aLinearDSSizes.png'),
                          width_1=45, height_1=15,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], 'F1b_LinearSizeGraph_Arithmetic.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], 'F1b_LinearSizeComb_Arithmetic.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], 'T1b_LinearSizes_Geometric.csv'),
+                         fig_2_name=paste0(dir_parent, dir_sub[conf], '1geo_bLinearDSSizeGraph.png'),
+                         fig_3_name=paste0(dir_parent, dir_sub[conf], '1geo_cLinearDSSizeCombination.png'),
+                         tab_name=paste0(dir_parent, dir_sub[conf], '1geo_dLinearDSSizes.csv'),
                          plot_to_file=plot_to_file, y_transform='identity'
   )
   
@@ -146,11 +155,11 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          info=infos[conf],
                          n_name='nRnd', m_name='mRnd',
                          power=power_1, power_method='Arithmetic', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], 'F2a_RandomSizes_Arithmetic.png'),
+                         fig_1_name=paste0(dir_parent, dir_sub[conf], '2ari_aRandomDSSizes.png'),
                          width_1=30, height_1=15,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], 'F2a_RandomSizeGraph_Arithmetic.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], 'F2a_RandomSizeComb_Arithmetic.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], 'T2a_RandomSizes_Arithmetic.csv'),
+                         fig_2_name=paste0(dir_parent, dir_sub[conf], '2ari_bRandomDSSizeGraph.png'),
+                         fig_3_name=paste0(dir_parent, dir_sub[conf], '2ari_cRandomDSSizeCombination.png'),
+                         tab_name=paste0(dir_parent, dir_sub[conf], '2ari_dRandomDSSizes.csv'),
                          plot_to_file=plot_to_file, y_transform='identity'
   )
   
@@ -158,11 +167,11 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          info=infos[conf],
                          n_name='nRnd', m_name='mRnd',
                          power=power_2, power_method='Geometric', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], 'F2b_RandomSizes_Geometric.png'),
+                         fig_1_name=paste0(dir_parent, dir_sub[conf], '2geo_aRandomDSSizes.png'),
                          width_1=30, height_1=20,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], 'F2b_RandomSizeGraph_Arithmetic.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], 'F2b_RandomSizeComb_Geometric.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], 'T2b_RandomSizes_Geometric.csv'),
+                         fig_2_name=paste0(dir_parent, dir_sub[conf], '2geo_bRandomDSSizeGraph.png'),
+                         fig_3_name=paste0(dir_parent, dir_sub[conf], '2geo_cRandomDSSizeCombination.png'),
+                         tab_name=paste0(dir_parent, dir_sub[conf], '2geo_dRandomDSSizes.csv'),
                          plot_to_file=plot_to_file, y_transform='identity'
   )
   
@@ -175,11 +184,11 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          info=infos[conf],
                          n_name='nN', m_name='mN',
                          power=power_1, power_method='Arithmetic', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], 'F3a_BenignDSs_Arithmetic.png'),
+                         fig_1_name=paste0(dir_parent, dir_sub[conf], '3ari_aBenignDSs.png'),
                          width_1=30, height_1=15,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], 'F3a_BenignDSGraph_Arithmetic.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], 'F3a_BenignDSComb_Arithmetic.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], 'T3a_BenignDSs_Arithmetic.csv'),
+                         fig_2_name=paste0(dir_parent, dir_sub[conf], '3ari_bBenignDSsGraph.png'),
+                         fig_3_name=paste0(dir_parent, dir_sub[conf], '3ari_cBenignDSCombination.png'),
+                         tab_name=paste0(dir_parent, dir_sub[conf], '3ari_dBenignDSs.csv'),
                          plot_to_file=plot_to_file, y_transform='identity'
   )
   
@@ -187,11 +196,11 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          info=infos[conf],
                          n_name='nN', m_name='mN',
                          power=power_2, power_method='Geometric', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], 'F3b_BenignDSs_Geometric.png'),
+                         fig_1_name=paste0(dir_parent, dir_sub[conf], '3geo_aBenignDSs.png'),
                          width_1=30, height_1=20,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], 'F3b_BenignDSGraph_Arithmetic.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], 'F3b_BenignDSComb_Geometric.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], 'T3b_GC_BenignDSs_Geometric.csv'),
+                         fig_2_name=paste0(dir_parent, dir_sub[conf], '3geo_bBenignDSsGraph.png'),
+                         fig_3_name=paste0(dir_parent, dir_sub[conf], '3geo_cBenignDSCombination.png'),
+                         tab_name=paste0(dir_parent, dir_sub[conf], '3geo_dBenignDSs.csv'),
                          plot_to_file=plot_to_file, y_transform='identity'
   )
   
@@ -204,11 +213,11 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          info=infos[conf],
                          n_name='nP', m_name='mP',
                          power=power_1, power_method='Arithmetic', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], 'F4a_MalignDSs_Arithmetic.png'),
+                         fig_1_name=paste0(dir_parent, dir_sub[conf], '4ari_aMalignDSs.png'),
                          width_1=30, height_1=15,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], 'F4a_MalignDSGraph_Arithmetic.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], 'F4a_MalignDSComb_Arithmetic.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], 'T4a_MalignDSs_Arithmetic.csv'),
+                         fig_2_name=paste0(dir_parent, dir_sub[conf], '4ari_bMalignDSsGraph.png'),
+                         fig_3_name=paste0(dir_parent, dir_sub[conf], '4ari_cMalignDSCombination.png'),
+                         tab_name=paste0(dir_parent, dir_sub[conf], '4ari_dMalignDSs.csv'),
                          plot_to_file=plot_to_file, y_transform='log10'
   )
   
@@ -216,11 +225,11 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          info=infos[conf],
                          n_name='nP', m_name='mP',
                          power=power_2, power_method='Geometric', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], 'F4b_MalignDSs_Geometric.png'),
+                         fig_1_name=paste0(dir_parent, dir_sub[conf], '4geo_aMalignDSs.png'),
                          width_1=30, height_1=20,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], 'F4b_MalignDSGraph_Arithmetic.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], 'F4b_MalignDSComb_Geometric.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], 'T4b_MalignDSs_Geometric.csv'),
+                         fig_2_name=paste0(dir_parent, dir_sub[conf], '4geo_bMalignDSsGraph.png'),
+                         fig_3_name=paste0(dir_parent, dir_sub[conf], '4geo_cMalignDSCombination.png'),
+                         tab_name=paste0(dir_parent, dir_sub[conf], '4geo_dMalignDSs.csv'),
                          plot_to_file=plot_to_file, y_transform='log10'
   )
   
@@ -232,11 +241,11 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          info=infos[conf],
                          n_name='nMalware', m_name='mMalware',
                          power=power_1, power_method='Arithmetic', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], 'F5a_MalwareFamilyDSs_Arithmetic.png'),
+                         fig_1_name=paste0(dir_parent, dir_sub[conf], '5ari_aMalwareFamilyDSs.png'),
                          width_1=40, height_1=15,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], 'F5a_MalwareFamilyDSGraph_Arithmetic.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], 'F5a_MalwareFamilyDSComb_Arithmetic.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], 'T5a_MalwareFamilyDSs_Arithmetic.csv'),
+                         fig_2_name=paste0(dir_parent, dir_sub[conf], '5ari_bMalwareFamilyDSsGraph.png'),
+                         fig_3_name=paste0(dir_parent, dir_sub[conf], '5ari_cMalwareFamilyDSCombination.png'),
+                         tab_name=paste0(dir_parent, dir_sub[conf], '5ari_dMalwareFamilyDSs.csv'),
                          plot_to_file=plot_to_file, y_transform='log10'
   )
   
@@ -244,11 +253,11 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          info=infos[conf],
                          n_name='nMalware', m_name='mMalware',
                          power=power_2, power_method='Geometric', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], 'F5b_MalwareFamilyDSs_Geometric.png'),
+                         fig_1_name=paste0(dir_parent, dir_sub[conf], '5geo_aMalwareFamilyDSs.png'),
                          width_1=40, height_1=20,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], 'F5b_MalwareFamilyDSGraph_Arithmetic.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], 'F5b_MalwareFamilyDSComb_Geometric.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], 'T5b_MalwareFamilyDSs_Geometric.csv'),
+                         fig_2_name=paste0(dir_parent, dir_sub[conf], '5geo_bMalwareFamilyDSsGraph.png'),
+                         fig_3_name=paste0(dir_parent, dir_sub[conf], '5geo_cMalwareFamilyDSCombination.png'),
+                         tab_name=paste0(dir_parent, dir_sub[conf], '5geo_dMalwareFamilyDSs.csv'),
                          plot_to_file=plot_to_file, y_transform='log10'
   )
 }
