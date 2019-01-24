@@ -29,19 +29,19 @@ loadTestData <- function(count_ds=9) {
   # Two-class data sets (see the article for the references)
   DSs <<- paste0(rep('DS', 5), 0:4)
   # Negative (benign mobile apps)
-  nN <<- c(84, 94, 83, 99, 118)
-  mN <<- c(264303, 254, 310926, 1000, 207865)
+  mN <<- c(84, 94, 83, 99, 118)
+  nN <<- c(264303, 254, 310926, 1000, 207865)
   # Positive (malign mobile apps (i.e. malware))
-  nP <<- c(90, 81, 69, 75, 73)
-  mP <<- c(399353, 280, 4868, 1000, 378)
+  mP <<- c(90, 81, 69, 75, 73)
+  nP <<- c(399353, 280, 4868, 1000, 378)
   
   # Specialized data sets (see the article for the references) 
   # Sample space size (m):  1,260  5,555  23,743  1,929  4,725  2,421
   # Feature space size (n):    65     94     105     78    111  85
   
   DSMs <<- c('AMGP', 'Drebin', 'AMD', 'ABot', 'VT2018', 'UpDroid')
-  nMalware <<- c(65, 94, 105, 78, 111, 85)
-  mMalware <<- c(1260, 5555, 23743, 1929, 4725, 2421)
+  mMalware <<- c(65, 94, 105, 78, 111, 85)
+  nMalware <<- c(1260, 5555, 23743, 1929, 4725, 2421)
 }
 
 processDsConfiguration <- function(n, m, dss, show_ds_info,
@@ -122,7 +122,7 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
   cat(paste0('Configuration ', conf, '/', count_conf, ': ', infos[conf], '\n'))
   cat('********************************************************************************\n')
   dss <- paste0(rep('DS', length(x1)), 1:length(x1))
-  processDsConfiguration(n=x1, m=y1, dss=dss, show_ds_info=TRUE,
+  processDsConfiguration(m=x1, n=y1, dss=dss, show_ds_info=TRUE,
                          info=infos[conf],
                          n_name='nLin', m_name='mLin',
                          power=power_1, power_method='Arithmetic', theta=theta,
@@ -134,7 +134,7 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          plot_to_file=plot_to_file, y_transform='identity'
   )
   
-  processDsConfiguration(n=x1, m=y1, dss=dss, show_ds_info=FALSE,
+  processDsConfiguration(m=x1, n=y1, dss=dss, show_ds_info=FALSE,
                          info=infos[conf],
                          n_name='nLin', m_name='mLin',
                          power=power_2, power_method='Geometric', theta=theta,
@@ -151,7 +151,7 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
   cat(paste0('\n\nConfiguration ', conf, '/', count_conf, ': ', infos[conf], '\n'))
   cat('********************************************************************************\n')
   dss <- paste0(rep('DS', length(xr1)), 1:length(xr1))
-  processDsConfiguration(n=xr1, m=yr1, dss=dss, show_ds_info=TRUE,
+  processDsConfiguration(m=xr1, n=yr1, dss=dss, show_ds_info=TRUE,
                          info=infos[conf],
                          n_name='nRnd', m_name='mRnd',
                          power=power_1, power_method='Arithmetic', theta=theta,
@@ -163,7 +163,7 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          plot_to_file=plot_to_file, y_transform='identity'
   )
   
-  processDsConfiguration(n=xr1, m=yr1, dss=dss, show_ds_info=FALSE,
+  processDsConfiguration(m=xr1, n=yr1, dss=dss, show_ds_info=FALSE,
                          info=infos[conf],
                          n_name='nRnd', m_name='mRnd',
                          power=power_2, power_method='Geometric', theta=theta,
@@ -175,14 +175,14 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          plot_to_file=plot_to_file, y_transform='identity'
   )
   
-  # 3) nN and mN
+  # 3) mN and nN
   conf <- conf + 1
   cat(paste0('\n\nConfiguration ', conf, '/', count_conf, ': ', infos[conf], '\n'))
   cat('********************************************************************************\n')
-  dss <- paste0(rep('DS', length(nN)), 1:length(nN))
-  processDsConfiguration(n=nN, m=mN, dss=dss, show_ds_info=TRUE,
+  dss <- paste0(rep('DS', length(mN)), 1:length(mN))
+  processDsConfiguration(m=mN, n=nN, dss=dss, show_ds_info=TRUE,
                          info=infos[conf],
-                         n_name='nN', m_name='mN',
+                         n_name='mN', m_name='nN',
                          power=power_1, power_method='Arithmetic', theta=theta,
                          fig_1_name=paste0(dir_parent, dir_sub[conf], '3ari_aBenignDSs.png'),
                          width_1=30, height_1=15,
@@ -192,9 +192,9 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          plot_to_file=plot_to_file, y_transform='identity'
   )
   
-  processDsConfiguration(n=nN, m=mN, dss=dss, show_ds_info=FALSE,
+  processDsConfiguration(m=mN, n=nN, dss=dss, show_ds_info=FALSE,
                          info=infos[conf],
-                         n_name='nN', m_name='mN',
+                         n_name='mN', m_name='nN',
                          power=power_2, power_method='Geometric', theta=theta,
                          fig_1_name=paste0(dir_parent, dir_sub[conf], '3geo_aBenignDSs.png'),
                          width_1=30, height_1=20,
@@ -204,14 +204,14 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          plot_to_file=plot_to_file, y_transform='identity'
   )
   
-  # 4) nP and mP
+  # 4) mP and nP
   conf <- conf + 1
   cat(paste0('\n\nConfiguration ', conf, '/', count_conf, ': ', infos[conf], '\n'))
   cat('********************************************************************************\n')
-  dss <- paste0(rep('DS', length(nP)), 1:length(nP))
-  processDsConfiguration(n=nP, m=mP, dss=dss, show_ds_info=TRUE,
+  dss <- paste0(rep('DS', length(mP)), 1:length(mP))
+  processDsConfiguration(m=mP, n=nP, dss=dss, show_ds_info=TRUE,
                          info=infos[conf],
-                         n_name='nP', m_name='mP',
+                         n_name='mP', m_name='nP',
                          power=power_1, power_method='Arithmetic', theta=theta,
                          fig_1_name=paste0(dir_parent, dir_sub[conf], '4ari_aMalignDSs.png'),
                          width_1=30, height_1=15,
@@ -221,9 +221,9 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          plot_to_file=plot_to_file, y_transform='log10'
   )
   
-  processDsConfiguration(n=nP, m=mP, dss=dss, show_ds_info=FALSE,
+  processDsConfiguration(m=mP, n=nP, dss=dss, show_ds_info=FALSE,
                          info=infos[conf],
-                         n_name='nP', m_name='mP',
+                         n_name='mP', m_name='nP',
                          power=power_2, power_method='Geometric', theta=theta,
                          fig_1_name=paste0(dir_parent, dir_sub[conf], '4geo_aMalignDSs.png'),
                          width_1=30, height_1=20,
@@ -233,13 +233,13 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          plot_to_file=plot_to_file, y_transform='log10'
   )
   
-  # 5) nMalware and mMalware
+  # 5) mMalware and nMalware
   conf <- conf + 1
   cat(paste0('\n\nConfiguration ', conf, '/', count_conf, ': ', infos[conf], '\n'))
   cat('********************************************************************************\n')
-  processDsConfiguration(n=nMalware, m=mMalware, dss=DSMs, show_ds_info=TRUE,
+  processDsConfiguration(m=mMalware, n=nMalware, dss=DSMs, show_ds_info=TRUE,
                          info=infos[conf],
-                         n_name='nMalware', m_name='mMalware',
+                         n_name='mMalware', m_name='nMalware',
                          power=power_1, power_method='Arithmetic', theta=theta,
                          fig_1_name=paste0(dir_parent, dir_sub[conf], '5ari_aMalwareFamilyDSs.png'),
                          width_1=40, height_1=15,
@@ -249,9 +249,9 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
                          plot_to_file=plot_to_file, y_transform='log10'
   )
   
-  processDsConfiguration(n=nMalware, m=mMalware, dss=DSMs, show_ds_info=FALSE,
+  processDsConfiguration(m=mMalware, n=nMalware, dss=DSMs, show_ds_info=FALSE,
                          info=infos[conf],
-                         n_name='nMalware', m_name='mMalware',
+                         n_name='mMalware', m_name='nMalware',
                          power=power_2, power_method='Geometric', theta=theta,
                          fig_1_name=paste0(dir_parent, dir_sub[conf], '5geo_aMalwareFamilyDSs.png'),
                          width_1=40, height_1=20,
@@ -294,48 +294,48 @@ testPlot <- function(power_1=1, power_2=0) {
   invisible(readline(prompt=paste('xr1 vs. yr1 (Geometric)',
                                   'Press [enter] to continue')))
   
-  # nN and mN
-  dss <- paste0(rep('DS', length(nN)), 1:length(nN))
-  result <- plotGCategoriesZScores(nN, mN, dss,
+  # mN and nN
+  dss <- paste0(rep('DS', length(mN)), 1:length(mN))
+  result <- plotGCategoriesZScores(mN, nN, dss,
                                    'Benign (negative-class) software datasets',
                                    power=power_1)
   wclip(result)
-  invisible(readline(prompt=paste('nN vs. mN (Arithmetic)',
+  invisible(readline(prompt=paste('mN vs. nN (Arithmetic)',
                                   'Press [enter] to continue')))
-  result <- plotGCategoriesZScores(nN, mN, dss,
+  result <- plotGCategoriesZScores(mN, nN, dss,
                                    'Benign (negative-class) software datasets',
                                    power=power_2)
   wclip(result)
-  invisible(readline(prompt=paste('nN vs. mN (Geometric)',
+  invisible(readline(prompt=paste('mN vs. nN (Geometric)',
                                   'Press [enter] to continue')))
   
-  # nP and mP
-  dss <- paste0(rep('DS', length(nP)), 1:length(nP))
-  result <- plotGCategoriesZScores(nP, mP, dss,
+  # mP and nP
+  dss <- paste0(rep('DS', length(mP)), 1:length(mP))
+  result <- plotGCategoriesZScores(mP, nP, dss,
                                    'Malign (positive-class) software datasets',
                                    power=power_1)
   wclip(result)
-  invisible(readline(prompt=paste('nP vs. mP (Arithmetic)',
+  invisible(readline(prompt=paste('mP vs. nP (Arithmetic)',
                                   'Press [enter] to continue')))
-  result <- plotGCategoriesZScores(nP, mP, dss,
+  result <- plotGCategoriesZScores(mP, nP, dss,
                                    'Malign (positive-class) software datasets',
                                    power=power_2)
   wclip(result)
-  invisible(readline(prompt=paste('nP vs. mP (Geometric)',
+  invisible(readline(prompt=paste('mP vs. nP (Geometric)',
                                   'Press [enter] to continue')))
   
-  # nMalware and mMalware
-  result <- plotGCategoriesZScores(nMalware, mMalware, DSMs,
+  # mMalware and nMalware
+  result <- plotGCategoriesZScores(mMalware, nMalware, DSMs,
                                    'Malign (positive-class) software (specialized) datasets',
                                    power=power_1)
   wclip(result)
-  invisible(readline(prompt=paste('nP vs. mP (Arithmetic)',
+  invisible(readline(prompt=paste('mP vs. nP (Arithmetic)',
                                   'Press [enter] to continue')))
-  result <- plotGCategoriesZScores(nMalware, mMalware, DSMs,
+  result <- plotGCategoriesZScores(mMalware, nMalware, DSMs,
                                    'Malign (positive-class) software (specialized) datasets',
                                    power=power_2)
   wclip(result)
-  invisible(readline(prompt=paste('nP vs. mP (Geometric)',
+  invisible(readline(prompt=paste('mP vs. nP (Geometric)',
                                   'Press [enter] to continue')))
 }
 
@@ -362,25 +362,25 @@ testDump <- function(power_1=1, power_2=0) {
   invisible(readline(prompt=paste('xr1 vs. yr1 (Geometric)',
                                   'Press [enter] to continue')))
   
-  # nN and mN
-  dss <- paste0(rep('DS', length(nN)), 1:length(nN))
-  result <- dumpGCategoriesZScores(nN, mN, power=power_1)
+  # mN and nN
+  dss <- paste0(rep('DS', length(mN)), 1:length(mN))
+  result <- dumpGCategoriesZScores(mN, nN, power=power_1)
   wclip(result)
-  invisible(readline(prompt=paste('nN vs. mN (Arithmetic)',
+  invisible(readline(prompt=paste('mN vs. nN (Arithmetic)',
                                   'Press [enter] to continue')))
-  result <- dumpGCategoriesZScores(nN, mN, power=power_2)
+  result <- dumpGCategoriesZScores(mN, nN, power=power_2)
   wclip(result)
-  invisible(readline(prompt=paste('nN vs. mN (Geometric)',
+  invisible(readline(prompt=paste('mN vs. nN (Geometric)',
                                   'Press [enter] to continue')))
   
-  # nP and mP
-  dss <- paste0(rep('DS', length(nP)), 1:length(nP))
-  result <- dumpGCategoriesZScores(nP, mP, power=power_1)
+  # mP and nP
+  dss <- paste0(rep('DS', length(mP)), 1:length(mP))
+  result <- dumpGCategoriesZScores(mP, nP, power=power_1)
   wclip(result)
-  invisible(readline(prompt=paste('nP vs. mP (Arithmetic)',
+  invisible(readline(prompt=paste('mP vs. nP (Arithmetic)',
                                   'Press [enter] to continue')))
-  result <- dumpGCategoriesZScores(nP, mP, power=power_2)
+  result <- dumpGCategoriesZScores(mP, nP, power=power_2)
   wclip(result)
-  invisible(readline(prompt=paste('nP vs. mP (Geometric)',
+  invisible(readline(prompt=paste('mP vs. nP (Geometric)',
                                   'Press [enter] to continue')))
 }
