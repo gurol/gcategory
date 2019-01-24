@@ -58,15 +58,15 @@ gc_large <- 5
 gc_na <- 6
 
 # G-Category: Names
-names_gc <- c(
+gc.names <- c(
   'Small', 'Medium', 'Shallow', 'Skinny', 'Large', 'NA')
-names_gc_TR <- c(
+gc.names.TR <- c(
   'Küçük', 'Orta', 'Sığ', 'Sıska', 'Geniş', 'U/D')
 # G-Category: Colors
 #  Small      Medium     Shallow    Skinny     Large      NA
-cols_gc <- c(
+gc.cols <- c(
   '#FC9ACF', '#FCB09A', '#9ABEFC', '#BC9AFC', '#D1FD9B', 'pink')
-cols_gc_bw <- c(
+gc.cols.bw <- c(
   '#7F7F7F', '#A6A6A6', '#BFBFBF', '#D9D9D9', '#F2F2F2', 'white')
 
 # See plotGCategories for mark shapes for G-Categories
@@ -102,15 +102,15 @@ cols_gc_bw <- c(
 #' @export
 #'
 #' @examples
-#' x <- c(1:11)
-#' y <- seq(110, 10, -10)
-#' greatnessCategory(1, x, y, power=0)
-#' greatnessCategory(1, x, y, power=1)
+#' x1 <- c(1:11)
+#' y1 <- seq(110, 10, -10)
+#' greatnessCategory(1, x1, y1, power=0)
+#' greatnessCategory(1, x1, y1, power=1)
 #' @note The method is proposed by Gürol Canbek. See the reference for citation.
 greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
                               power_stat_x=NULL,
                               power_stat_y=NULL,
-                              names_gc=names_gc)
+                              names_gc=gc.names)
 {
   if (is.na(x[i]))
     return ('NA')
@@ -161,9 +161,10 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
     if (is.na(z_score_x) || is.na(z_score_y)) {
       gc_type <- gc_na
     }
-    else if ((abs(z_score_x) <= theta_scaled || abs(z_score_y) <= theta_scaled) ||
-             ((z_score_x > theta_scaled && z_score_x < 2*theta_scaled) &&
-              (z_score_y > theta_scaled && z_score_y < 2*theta_scaled))
+    else if (
+      (abs(z_score_x) <= theta_scaled || abs(z_score_y) <= theta_scaled) ||
+      ((z_score_x > theta_scaled && z_score_x < 2*theta_scaled) &&
+       (z_score_y > theta_scaled && z_score_y < 2*theta_scaled))
     ) {
       gc_type <- gc_medium
     }
@@ -193,15 +194,14 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
 
 #' @param x a numeric feature space sizes vector (m)
 #' @param y a numeric sample space sizes vector (n)
-#' @param power power coefficient (-1: Harmonic; 0: Geometric (pure);
-#' 0.25: Geometric mean, Geometric SD, Geometric z-score, Arithmetic
-#' categorization; 0.75: Geometric mean, Arithmetic SD, Arithmetic z-score,
-#' Arithmetic categorization; 1: Arithmetic mean (Pure); 2: Mean square;
-#' 3: Mean cube) (default: \code{1} for pure arithmetic mean)
-#' @param theta threshold value for the categorization'
+#' @param power power coefficient (-1: Harmonic; 0: Geometric (pure);  
+#' 0.25: Geometric mean, Geometric SD, Geometric z-score, Arithmetic  
+#' categorization; 0.75: Geometric mean, Arithmetic SD, Arithmetic z-score,  
+#' Arithmetic categorization; 1: Arithmetic mean (Pure); 2: Mean square;  
+#' 3: Mean cube) (default: \code{1} for pure arithmetic mean)  
+#' @param theta threshold value for the categorization'  
 #' @param na.rm NA values are removed before calculations (default: \code{TRUE})
-#' @seealso \code{\link{greatnessCategory}} for
-#' single element
+#' @seealso \code{\link{greatnessCategory}} for a single element
 #'
 #' @return G-Categories (text vector)
 #' @export
@@ -215,12 +215,13 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
 #' nP <- c(399353, 280, 4868, 1000, 378)
 #' gcP <- greatnessCategories(mP, nP)
 #' gcP
-#' x <- c(1:11)
-#' y <- seq(110, 10, -10)
-#' greatnessCategories(x, y, power=0)
-#' greatnessCategories(x, y, power=1)
+#' x1 <- c(1:11)
+#' y1 <- seq(110, 10, -10)
+#' greatnessCategories(x1, y1, power=0)
+#' greatnessCategories(x1, y1, power=1)
 #' @note The method is proposed by Gürol Canbek. See the reference for citation.
-greatnessCategories <- function(x, y, power=0, theta=1, na.rm=TRUE)
+greatnessCategories <- function(x, y, power=0, theta=1, na.rm=TRUE,
+                                names_gc=gc.names)
 {
   if (na.rm) {
     x <- x[is.na(x) == FALSE]
@@ -233,7 +234,8 @@ greatnessCategories <- function(x, y, power=0, theta=1, na.rm=TRUE)
                 function(x, i) greatnessCategory(
                   i, x, y, power=power, theta=theta, na.rm=na.rm,
                   power_stat_x=power_stat_x,
-                  power_stat_y=power_stat_y),
+                  power_stat_y=power_stat_y,
+                  names_gc=names_gc),
                 x=x)
   
   return (unlist(GCs))
@@ -241,24 +243,29 @@ greatnessCategories <- function(x, y, power=0, theta=1, na.rm=TRUE)
 
 # dumpGCategoriesZScores(mN, nN, round_digit=1)
 # dumpGCategoriesZScores(mP, nP, round_digit=1)
-dumpGCategoriesZScores<-function(x, y, power=0, theta=1, na.rm=TRUE, round_digit=6)
+dumpGCategoriesZScores<-function(x, y, power=0, theta=1, na.rm=TRUE,
+                                 round_digit=6, names_gc=gc.names)
 {
-  GCs <- greatnessCategories(x, y, power=power, theta=theta, na.rm=na.rm)
+  GCs <- greatnessCategories(x, y, power=power, theta=theta, na.rm=na.rm,
+                             names_gc=names_gc)
   zx <- powerZScores(x, power=power, na.rm=na.rm)
   zsc_y <- powerZScores(y, power=power, na.rm=na.rm)
   
-  return(list(GCs=t(GCs), zx=t(round(zx, round_digit)), zy=t(round(zsc_y, round_digit))))
+  return(list(
+    GCs=t(GCs),
+    zx=t(round(zx, round_digit)),
+    zy=t(round(zsc_y, round_digit))))
 }
 
 plotGCategoriesZScoresSeperated <- function(x, y, DSs, power=0, round_digit=1,
                                             arrange=TRUE, theta=1, na.rm=TRUE,
                                             boldDiagonals=FALSE,
-                                            names_gc=names_gc,
-                                            cols_gc=cols_gc)
+                                            names_gc=gc.names,
+                                            cols_gc=gc.cols)
 {
   result <- tabulateGreatnessCategories(
     x, y, DSs, power=power, arrange=arrange,
-    theta=theta, na.rm=na.rm)
+    theta=theta, na.rm=na.rm, names_gc=names_gc)
 
   # Extract only G-categories
   # "DS2 (skinny)" -> "skinny"
@@ -288,10 +295,10 @@ plotGCategoriesZScoresSeperated <- function(x, y, DSs, power=0, round_digit=1,
   }
 
   mytheme <- gridExtra::ttheme_minimal(
-    core = list(fg_params=list(cex=0.7, fontface=fontfaces),
+    core=list(fg_params=list(cex=0.7, fontface=fontfaces),
                 bg_params=list(fill=cols)),
-    colhead = list(fg_params=list(cex=0.8)),
-    rowhead = list(fg_params=list(cex=0.8)))
+    colhead=list(fg_params=list(cex=0.8)),
+    rowhead=list(fg_params=list(cex=0.8)))
 
   grobGC <- tableGrob(result, theme=mytheme)
   grobGC <- addTitleToGrob(grobGC, 'G-Categories')
@@ -312,11 +319,13 @@ plotGCategoriesZScoresSeperated <- function(x, y, DSs, power=0, round_digit=1,
 
     if (power == 0) {
       interpret[which(interpret == ds, arr.ind=TRUE)] <- paste(
-        round(sqrt(zy/zx), round_digit), '(', round(sqrt(zy*zx), round_digit), ')')
+        round(sqrt(zy/zx), round_digit),
+        '(', round(sqrt(zy*zx), round_digit), ')')
     }
     else if (power > 0 && power <= 1) {
       interpret[which(interpret == ds, arr.ind=TRUE)] <- paste(
-        round(sqrt(zy/zx), round_digit), '(', round((zy + zx)/2.0, round_digit), ')')
+        round(sqrt(zy/zx), round_digit),
+        '(', round((zy + zx)/2.0, round_digit), ')')
     }
   }
 
@@ -353,11 +362,11 @@ plotGCategoriesZScores <- function(x, y, DSs, info,
                                    power=0, theta=1, round_digit=1,
                                    arrange=TRUE, na.rm=TRUE,
                                    boldDiagonals=FALSE,
-                                   names_gc=names_gc, cols_gc=cols_gc)
+                                   names_gc=gc.names, cols_gc=gc.cols)
 {
   result <- tabulateGreatnessCategories(
     x, y, DSs, power=power, arrange=arrange,
-    theta=theta, na.rm=na.rm)
+    theta=theta, na.rm=na.rm, names_gc=names_gc)
   
   # Extract only G-categories
   # "DS2 (skinny)" -> "skinny"
@@ -397,13 +406,13 @@ plotGCategoriesZScores <- function(x, y, DSs, info,
     
     if (power == 0) {
       interpret <- paste0(
-        '√(Zm*Zn)=', round(sqrt(zsc_y[ind]*zx[ind]), round_digit), ' (Zn/Zm=',
-        round(zsc_y[ind]/zx[ind], round_digit), ')')
+        '√(Zm*Zn)=', round(sqrt(zsc_y[ind]*zx[ind]), round_digit),
+        ' (Zn/Zm=', round(zsc_y[ind]/zx[ind], round_digit), ')')
     }
     else if (power > 0 && power <= 1) {
       interpret <- paste0(
-        '(Zm+Zn)/2=', round((zsc_y[ind] + zx[ind])/2.0, round_digit), ' (Zn-Zm=',
-        round(zsc_y[ind] - zx[ind], round_digit), ')')
+        '(Zm+Zn)/2=', round((zsc_y[ind] + zx[ind])/2.0, round_digit),
+        ' (Zn-Zm=', round(zsc_y[ind] - zx[ind], round_digit), ')')
     }
     
     inds <- which(result_ds == ds, arr.ind=TRUE)
@@ -418,10 +427,10 @@ plotGCategoriesZScores <- function(x, y, DSs, info,
   }
   
   mytheme <- gridExtra::ttheme_minimal(
-    core = list(fg_params=list(cex=0.65, fontface=fontfaces),
+    core=list(fg_params=list(cex=0.65, fontface=fontfaces),
                 bg_params=list(fill=cols)),
-    colhead = list(fg_params=list(cex=0.7)),
-    rowhead = list(fg_params=list(cex=0.7)))
+    colhead=list(fg_params=list(cex=0.7)),
+    rowhead=list(fg_params=list(cex=0.7)))
   
   grobGC <- tableGrob(result, theme=mytheme)
   
@@ -448,13 +457,13 @@ plotGCategoriesZScores <- function(x, y, DSs, info,
 }
 
 # Simulation
-# x <- c(1:11)
-# y <- seq(110, 10, -10)
-# GCs <- greatnesCategoriesCombination(x, y)
+# x1 <- c(1:11)
+# y1 <- seq(110, 10, -10)
+# GCs <- greatnesCategoriesCombination(x1, y1)
 # wclip(GCs) # Paste to spreadsheet
-# GCs <- greatnesCategoriesCombination(x, y, power=0)
+# GCs <- greatnesCategoriesCombination(x1, y1, power=0)
 # wclip(GCs) # Paste to spreadsheet
-# GCs <- greatnesCategoriesCombination(x, y, power=1)
+# GCs <- greatnesCategoriesCombination(x1, y1, power=1)
 # wclip(GCs) # Paste to spreadsheet
 #
 # Benign (N) data sets
@@ -466,15 +475,16 @@ plotGCategoriesZScores <- function(x, y, DSs, info,
 # nP <- c(90, 81, 69, 75, 83, 73)
 # mP <- c(399353, 280, 4868, 1000, 1260, 378)
 # GCs <- greatnesCategoriesCombination(nP, mP)
-greatnesCategoriesCombination <- function(x, y, power=0, arrange=TRUE, theta=1, na.rm=TRUE)
+greatnesCategoriesCombination <- function(x, y, power=0, arrange=TRUE, theta=1,
+                                          na.rm=TRUE, names_gc=gc.names)
 {
   if (na.rm == TRUE) {
     x <- x[is.na(x) == FALSE]
     y <- y[is.na(y) == FALSE]
   }
   
-  ncol=length(x)
-  nrow=length(y)
+  ncol <- length(x)
+  nrow <- length(y)
   xx <- matrix(nrow=nrow, ncol=ncol)
   yy <- matrix(nrow=nrow, ncol=ncol)
   
@@ -492,7 +502,7 @@ greatnesCategoriesCombination <- function(x, y, power=0, arrange=TRUE, theta=1, 
   
   xx <- as.vector(xx)
   yy <- as.vector(yy)
-  GCs <- greatnessCategories(xx, yy, power=power, theta=theta, na.rm=na.rm)
+  GCs <- greatnessCategories(xx, yy, power=power, theta=theta, na.rm=na.rm, names_gc=names_gc)
   
   dim(GCs) <- c(ncol, nrow)
   dimnames(GCs) <- list(x, y)
@@ -500,19 +510,19 @@ greatnesCategoriesCombination <- function(x, y, power=0, arrange=TRUE, theta=1, 
   return(t(GCs))
 }
 
-# x <- c(1:11)
-# y <- seq(110, 10, -10)
-# result <- dumpAllDSCombinationGCs(x, y)
+# x1 <- c(1:11)
+# y1 <- seq(110, 10, -10)
+# result <- dumpAllDSCombinationGCs(x1, y1)
 dumpAllDSCombinationGCs <- function(x, y, power=0,
-                                    arrange=TRUE, theta=1, na.rm=TRUE)
+                                    arrange=TRUE, theta=1, na.rm=TRUE, names_gc=gc.names)
 {
   if (na.rm == TRUE) {
     x <- x[is.na(x) == FALSE]
     y <- y[is.na(y) == FALSE]
   }
   
-  ncol=length(x)
-  nrow=length(y)
+  ncol <- length(x)
+  nrow <- length(y)
   xx <- matrix(nrow=nrow, ncol=ncol)
   yy <- matrix(nrow=nrow, ncol=ncol)
   
@@ -530,7 +540,7 @@ dumpAllDSCombinationGCs <- function(x, y, power=0,
   
   xx <- as.vector(xx)
   yy <- as.vector(yy)
-  GCs <- greatnessCategories(x=xx, y=yy, power=power, theta=theta, na.rm=na.rm)
+  GCs <- greatnessCategories(x=xx, y=yy, power=power, theta=theta, na.rm=na.rm, names_gc=names_gc)
   
   dim(GCs) <- c(ncol, nrow)
   dimnames(GCs) <- list(x, y)
@@ -552,14 +562,15 @@ dumpAllDSCombinationGCs <- function(x, y, power=0,
 # plotGCategoriesTable(nN, mN, DSs)
 # plot.new()
 # plotGCategoriesTable(nP, mP, DSs)
+# plotGCategoriesTable(nP, mP, DSs, cols_gc=gc.cols.bw)
 plotGCategoriesTable <- function(x, y, DSs, power=0,
                                  arrange=TRUE, theta=1, na.rm=TRUE,
                                  boldDiagonals=FALSE,
-                                 names_gc=names_gc, cols_gc=cols_gc)
+                                 names_gc=gc.names, cols_gc=gc.cols)
 {
   result <- tabulateGreatnessCategories(
     x, y, DSs, power=power, arrange=arrange,
-    theta=theta, na.rm=na.rm)
+    theta=theta, na.rm=na.rm, names_gc=names_gc)
   
   # result_pure <- gsub("DS.+ \\(|\\)", "", result)
   result_pure <- gsub(".+ \\(|\\)", "", result)
@@ -584,10 +595,10 @@ plotGCategoriesTable <- function(x, y, DSs, power=0,
   }
   
   mytheme <- gridExtra::ttheme_minimal(
-    core = list(fg_params=list(cex=0.7, fontface=fontfaces),
-                bg_params=list(fill=cols)),
-    colhead = list(fg_params=list(cex=0.8)),
-    rowhead = list(fg_params=list(cex=0.8)))
+    core=list(fg_params=list(cex=0.7, fontface=fontfaces),
+              bg_params=list(fill=cols)),
+    colhead=list(fg_params=list(cex=0.8)),
+    rowhead=list(fg_params=list(cex=0.8)))
   
   grobGCs <- tableGrob(result, theme=mytheme)
   
@@ -600,7 +611,7 @@ plotGCategoriesTable <- function(x, y, DSs, power=0,
 # tabulateGreatnessCategories(nN, mN, DSs)
 # tabulateGreatnessCategories(nP, mP, DSs)
 tabulateGreatnessCategories <- function(
-  x, y, DSs, power=0, arrange=TRUE, theta=1, na.rm=TRUE)
+  x, y, DSs, power=0, arrange=TRUE, theta=1, na.rm=TRUE, names_gc=gc.names)
 {
   NA_DSs <- DSs[is.na(y) == TRUE]
   
@@ -610,7 +621,8 @@ tabulateGreatnessCategories <- function(
     y <- y[is.na(y) == FALSE]
   }
   
-  GCs <- greatnessCategories(x, y, power=power, theta=theta, na.rm=na.rm)
+  GCs <- greatnessCategories(x, y, power=power, theta=theta, na.rm=na.rm,
+                             names_gc=names_gc)
   
   x_y <- rbind(cbind(paste(x), paste(y), DSs, GCs))
   
@@ -666,11 +678,11 @@ tabulateGreatnessCategories <- function(
 plotCombination <- function(x, y, power=0, round_digit=1,
                             arrange=TRUE, theta=1, na.rm=TRUE,
                             boldDiagonals=FALSE,
-                            names_gc=names_gc, cols_gc=cols_gc)
+                            names_gc=gc.names, cols_gc=gc.cols)
 {
   GCs <- greatnesCategoriesCombination(
     x, y, power=power, arrange=arrange,
-    theta=theta, na.rm=na.rm)
+    theta=theta, na.rm=na.rm, names_gc=names_gc)
   
   cols <- as.table(matrix('white', nrow(GCs), ncol(GCs)))
   
@@ -693,10 +705,10 @@ plotCombination <- function(x, y, power=0, round_digit=1,
   }
   
   mytheme <- gridExtra::ttheme_minimal(
-    core = list(fg_params=list(cex=0.6, fontface=fontfaces),
-                bg_params=list(fill=cols)),
-    colhead = list(fg_params=list(cex=0.7)),
-    rowhead = list(fg_params=list(cex=0.7)))
+    core=list(fg_params=list(cex=0.6, fontface=fontfaces),
+              bg_params=list(fill=cols)),
+    colhead=list(fg_params=list(cex=0.7)),
+    rowhead=list(fg_params=list(cex=0.7)))
   
   grobGCs <- tableGrob(GCs, theme=mytheme)
   
@@ -710,10 +722,10 @@ plotCombination <- function(x, y, power=0, round_digit=1,
 plotCombinationAll <- function(x, y, power=0, round_digit=1,
                                arrange=TRUE, theta=1, na.rm=TRUE,
                                boldDiagonals=FALSE,
-                               names_gc=names_gc, cols_gc=cols_gc)
+                               names_gc=gc.names, cols_gc=gc.cols)
 {
   result <- dumpAllDSCombinationGCs(x, y, power=power, arrange=arrange,
-                                    theta=theta, na.rm=na.rm)
+                                    theta=theta, na.rm=na.rm, names_gc=names_gc)
   
   cols <- as.table(matrix('white', nrow(result$GCs), ncol(result$GCs)))
   
@@ -736,10 +748,10 @@ plotCombinationAll <- function(x, y, power=0, round_digit=1,
   }
   
   mytheme <- gridExtra::ttheme_minimal(
-    core = list(fg_params=list(cex=0.6, fontface=fontfaces),
+    core=list(fg_params=list(cex=0.6, fontface=fontfaces),
                 bg_params=list(fill=cols)),
-    colhead = list(fg_params=list(cex=0.7)),
-    rowhead = list(fg_params=list(cex=0.7)))
+    colhead=list(fg_params=list(cex=0.7)),
+    rowhead=list(fg_params=list(cex=0.7)))
   
   grobGCs <- tableGrob(result$GCs, theme=mytheme)
   grobGCs <- addTitleToGrob(grobGCs, 'G-Categories')
@@ -810,7 +822,7 @@ addTitleToGrob<-function(grob, title, fontsize=12)
 plotGCategories<-function(x, y, GCs, DSs,
                           na.rm=TRUE, draw=TRUE, trans='identity',
                           subtitle=NULL,
-                          names_gc=names_gc, cols_gc=cols_gc)
+                          names_gc=gc.names, cols_gc=gc.cols)
 {
   x_name <- deparse(substitute(x))
   y_name <- deparse(substitute(y))
