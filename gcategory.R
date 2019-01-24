@@ -780,7 +780,8 @@ addTitleToGrob<-function(grob, title, fontsize=12)
 # plot.new()
 # plotGCategories(nN, mN, gcN, DSsN, trans='log10')
 plotGCategories<-function(x, y, GCs, DSs,
-                          na.rm=TRUE, draw=TRUE, trans='identity')
+                          na.rm=TRUE, draw=TRUE, trans='identity',
+                          subtitle=NULL)
 {
   x_name <- deparse(substitute(x))
   y_name <- deparse(substitute(y))
@@ -792,13 +793,14 @@ plotGCategories<-function(x, y, GCs, DSs,
   
   ds_dist <- cbind.data.frame(x, y, GCs, DSs)
   
+  # 1:Small, 2:Medium, 3:Shallow, 4:Skinny, 5:Large, 6:NA
   #                1   2   3               4               5   6
   mark_shapes <- c(15, 15, charToRaw('-'), charToRaw('|'), 15, 8)
   names(mark_shapes) <- names_gc
   mark_colors <- cols_gc
   names(mark_colors) <- names_gc
   #               1  2  3  4  5  6
-  mark_sizes <- c(3, 6, 9, 9, 9, 9)
+  mark_sizes <- c(3, 6, 17, 9, 9, 9)
   names(mark_sizes) <- names_gc
   
   p <- ggplot(ds_dist, aes(x=x, y=y)) +
@@ -806,7 +808,7 @@ plotGCategories<-function(x, y, GCs, DSs,
     scale_color_manual(values=mark_colors) +
     scale_size_manual(values=mark_sizes) +
     theme_bw() +
-    labs(x=x_name, y=y_name) +
+    labs(x=x_name, y=y_name, subtitle=subtitle) +
     geom_point(aes(shape=GCs, size=GCs, color=GCs)) +
     geom_text(aes(label=DSs, hjust=0.5, vjust=-2), size=4) +
     scale_x_continuous(labels=comma) +
