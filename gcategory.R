@@ -75,8 +75,8 @@ cols_gc <- c('#FC9ACF', '#FCB09A', '#9ABEFC', '#BC9AFC', '#D1FD9B', 'pink')
 # The method is proposed by Gürol Canbek. See the reference for citation.
 #'
 #' @param i the index of the dataset in a dataset vector
-#' @param x a numeric feature space sizes vector (n)
-#' @param y a numeric sample space sizes vector (m)
+#' @param x a numeric feature space sizes vector (m)
+#' @param y a numeric sample space sizes vector (n)
 #' @param power power coefficient (-1: Harmonic; 0: Geometric (pure);
 #' 0.25: Geometric mean, Geometric SD, Geometric z-score, Arithmetic
 #' categorization; 0.75: Geometric mean, Arithmetic SD, Arithmetic z-score,
@@ -185,8 +185,8 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
   return (gcs[gc_type])
 }
 
-#' @param x a numeric feature space sizes vector (n)
-#' @param y a numeric sample space sizes vector (m)
+#' @param x a numeric feature space sizes vector (m)
+#' @param y a numeric sample space sizes vector (n)
 #' @param power power coefficient (-1: Harmonic; 0: Geometric (pure);
 #' 0.25: Geometric mean, Geometric SD, Geometric z-score, Arithmetic
 #' categorization; 0.75: Geometric mean, Arithmetic SD, Arithmetic z-score,
@@ -201,13 +201,13 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
 #' @export
 #'
 #' @examples
-#' nN <- c(84, 94, 83, 99, 118)
-#' mN <- c(264303, 254, 310926, 1000, 207865)
-#' gcN <- greatnessCategories(nN, mN)
+#' mN <- c(84, 94, 83, 99, 118)
+#' nN <- c(264303, 254, 310926, 1000, 207865)
+#' gcN <- greatnessCategories(mN, nN)
 #' gcN
-#' nP <- c(90, 81, 69, 75, 73)
-#' mP <- c(399353, 280, 4868, 1000, 378)
-#' gcP <- greatnessCategories(nP, mP)
+#' mP <- c(90, 81, 69, 75, 73)
+#' nP <- c(399353, 280, 4868, 1000, 378)
+#' gcP <- greatnessCategories(mP, nP)
 #' gcP
 #' x <- c(1:11)
 #' y <- seq(110, 10, -10)
@@ -233,8 +233,8 @@ greatnessCategories <- function(x, y, power=0, theta=1, na.rm=TRUE)
   return (unlist(gcs))
 }
 
-# dumpGCategoriesZScores(nN, mN, round_digit=1)
-# dumpGCategoriesZScores(nP, mP, round_digit=1)
+# dumpGCategoriesZScores(mN, nN, round_digit=1)
+# dumpGCategoriesZScores(mP, nP, round_digit=1)
 dumpGCategoriesZScores<-function(x, y, power=0, theta=1, na.rm=TRUE, round_digit=6)
 {
   gcs <- greatnessCategories(x, y, power=power, theta=theta, na.rm=na.rm)
@@ -335,7 +335,7 @@ plotGCategoriesZScoresSeperated <- function(x, y, DSs, power=0, round_digit=1,
                ncol=2, nrow=2,
                layout_matrix=rbind(c(1, 2),
                                    c(3, 4)),
-               top=paste('G-Categories, Z(n), Z(m), and Z(m)/Z(n) with (geometric/aritmetic means) of Data Sets via',
+               top=paste('G-Categories, Z(m), Z(n), and Z(n)/Z(m) with (geometric/aritmetic means) of Data Sets via',
                          powerMeanTypes(power)))
 }
 
@@ -386,12 +386,12 @@ plotGCategoriesZScores <- function(x, y, DSs, info,
     
     if (power == 0) {
       interpret <- paste0(
-        '√(Zn*Zm)=', round(sqrt(zsc_y[ind]*zsc_x[ind]), round_digit), ' (Zm/Zn=',
+        '√(Zm*Zn)=', round(sqrt(zsc_y[ind]*zsc_x[ind]), round_digit), ' (Zn/Zm=',
         round(zsc_y[ind]/zsc_x[ind], round_digit), ')')
     }
     else if (power > 0 && power <= 1) {
       interpret <- paste0(
-        '(Zn+Zm)/2=', round((zsc_y[ind] + zsc_x[ind])/2.0, round_digit), ' (Zm-Zn=',
+        '(Zm+Zn)/2=', round((zsc_y[ind] + zsc_x[ind])/2.0, round_digit), ' (Zn-Zm=',
         round(zsc_y[ind] - zsc_x[ind], round_digit), ')')
     }
     
@@ -399,8 +399,8 @@ plotGCategoriesZScores <- function(x, y, DSs, info,
     original <- result[inds]
     more_detailed <- paste0(
       original,
-      '\nnxm=', x[ind], ' x ', y[ind],
-      ' ZnxZm=', zx, ' x ', zy,
+      '\nmxn=', x[ind], ' x ', y[ind],
+      ' ZmxZn=', zx, ' x ', zy,
       '\n', interpret
     )
     result[inds] <- more_detailed
@@ -423,11 +423,11 @@ plotGCategoriesZScores <- function(x, y, DSs, info,
                           powerMeanTypes(power), ': ',
                           info),
                bottom=paste0(length(DSs), ' datasets, ',
-                          'n (', x_name, ') statistics: min=',
+                          'm (', x_name, ') statistics: min=',
                           round(min(zsc_x), 1),
                           ', average=', round(mean(zsc_x), 1),
                           ', max=', round(max(zsc_x), 1),
-                          '. m (', y_name, ') statistics: min=',
+                          '. n (', y_name, ') statistics: min=',
                           round(min(zsc_y), 1),
                           ', average=', round(mean(zsc_y), 1),
                           ', max=', round(max(zsc_y), 1))
@@ -626,15 +626,15 @@ tabulateGreatnessCategories <- function(
     }
   }
   
-  n <- 1
-  nlast <- ncol(xy)
-  while (n <= nlast) {
-    if (all(xy[, n] == '')) {
-      xy <- xy[, -n]
-      nlast <- ncol(xy)
+  m <- 1
+  mlast <- ncol(xy)
+  while (m <= mlast) {
+    if (all(xy[, m] == '')) {
+      xy <- xy[, -m]
+      mlast <- ncol(xy)
     }
     else {
-      n <- n + 1
+      m <- m + 1
     }
   }
   
@@ -679,8 +679,8 @@ plotCombination <- function(x, y, power=0, round_digit=1,
   
   grid.arrange(grobGC,
                ncol=1, nrow=1,
-               top=paste0('G-Categories of Data Sets with n (', length(x),
-                         ') x ', 'm (', length(y), ') Combinations\nvia ',
+               top=paste0('G-Categories of Data Sets with m (', length(x),
+                         ') x ', 'n (', length(y), ') Combinations\nvia ',
                          powerMeanTypes(power)))
 }
 
@@ -752,8 +752,8 @@ plotCombinationAll <- function(x, y, power=0, round_digit=1,
                ncol=2, nrow=2,
                layout_matrix=rbind(c(1, 2),
                                    c(3, 4)),
-               top=paste('G-Categories of Data Sets with n (', length(x),
-                         ') x ', 'm (', length(y), ') Combinations via',
+               top=paste('G-Categories of Data Sets with m (', length(x),
+                         ') x ', 'n (', length(y), ') Combinations via',
                          powerMeanTypes(power)))
 }
 
@@ -771,14 +771,14 @@ addTitleToGrob<-function(grob, title, fontsize=12)
 
 
 # DSsP <- paste0(rep('DS', 6), 0:5)
-# plotGCategories(nP, mP, gcP, DSsP)
+# plotGCategories(mP, nP, gcP, DSsP)
 # plot.new()
 # DSsN <- paste0(rep('DS', 6), 0:5)[-5]
-# plotGCategories(nN, mN, gcN, DSsN)
+# plotGCategories(mN, nN, gcN, DSsN)
 # sample size (m) logaritmic scale
-# plotGCategories(nP, mP, gcP, DSsP, trans='log10')
+# plotGCategories(mP, nP, gcP, DSsP, trans='log10')
 # plot.new()
-# plotGCategories(nN, mN, gcN, DSsN, trans='log10')
+# plotGCategories(mN, nN, gcN, DSsN, trans='log10')
 plotGCategories<-function(x, y, GCs, DSs,
                           na.rm=TRUE, draw=TRUE, trans='identity',
                           subtitle=NULL)
