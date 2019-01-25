@@ -121,13 +121,13 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
     power_stat_x <- powerStatistics(x, power=power, na.rm=na.rm)
   }
   zx <- powerZScore(i, x, power=power, na.rm=na.rm,
-                           power_statistics=power_stat_x)
+                    power_statistics=power_stat_x)
   
   if (TRUE == is.null(power_stat_y)) {
     power_stat_y <- powerStatistics(y, power=power, na.rm=na.rm)
   }
   zy <- powerZScore(i, y, power=power, na.rm=na.rm,
-                           power_statistics=power_stat_y)
+                    power_statistics=power_stat_y)
   
   if (power == 0) {
     # Geometric
@@ -243,10 +243,40 @@ greatnessCategories <- function(x, y, power=0, theta=1, na.rm=TRUE,
   return (unlist(GCs))
 }
 
+# dumpGCsWithZ(mN, nN, round_digit=1)
+# dumpGCsWithZ(mP, nP, round_digit=1)
+dumpGCsWithZ<-function(x, y, power=0, theta=1,
+                       na.rm=TRUE, round_digit=7, names_gc=gc.names)
+{
+  GCs <- greatnessCategories(x, y, power=power, theta=theta, na.rm=na.rm,
+                             names_gc=names_gc)
+  zx <- powerZScores(x, power=power, na.rm=na.rm)
+  zy <- powerZScores(y, power=power, na.rm=na.rm)
+  
+  pmean_zxy <- numeric()
+  
+  if (power == 0) {
+    pmean_zxy <- round(sqrt(zx*zy), round_digit)
+  }
+  else {
+    pmean_zxy <- round((zx+zy)/2, round_digit)
+  }
+  
+  result <- list(
+    GCs=GCs,
+    zx=round(zx, round_digit),
+    zy=round(zy, round_digit),
+    pmean_zxy=pmean_zxy
+  )
+  
+  return (result)
+}
+
 # tabulateGCs(nN, mN, DSs)
 # tabulateGCs(nP, mP, DSs)
 tabulateGCs <- function(
-  x, y, DSs, power=0, arrange=TRUE, theta=1, na.rm=TRUE, names_gc=gc.names)
+  x, y, DSs, power=0, theta=1, include_power_mean=FALSE,
+  arrange=TRUE, na.rm=TRUE, round_digit=1, names_gc=gc.names)
 {
   NA_DSs <- DSs[is.na(y) == TRUE]
   
@@ -256,10 +286,14 @@ tabulateGCs <- function(
     y <- y[is.na(y) == FALSE]
   }
   
-  GCs <- greatnessCategories(x, y, power=power, theta=theta, na.rm=na.rm,
-                             names_gc=names_gc)
+  result <- dumpGCsWithZ(x, y, power=power, theta=theta,
+                         na.rm=na.rm, round_digit=round_digit,
+                         names_gc=names_gc)
   
-  x_y <- rbind(cbind(paste(x), paste(y), DSs, GCs))
+  #                  1         2         3
+  x_y <- rbind(cbind(paste(x), paste(y), DSs,
+  #                  4           5
+                     result$GCs, paste(result$pmean_zxy)))
   
   if (arrange) {
     x <- sort(x)
@@ -279,7 +313,10 @@ tabulateGCs <- function(
   for (i in 1:nrow) {
     col_ds <- match(x_y[i, 1], colnames_xy)
     row_ds <- match(x_y[i, 2], rownames_xy)
-    xy[row_ds, col_ds] <- paste0(x_y[i, 3], ' (', x_y[i, 4], ')')
+    xy[row_ds, col_ds] <- paste0(
+      x_y[i, 3], ' (', x_y[i, 4],
+      ifelse(include_power_mean,
+             paste0(', ', x_y[i, 5]), ''), ')')
   }
   
   # Remove empty rows and columns (for the same n and m values)
@@ -310,37 +347,25 @@ tabulateGCs <- function(
   return (xy)
 }
 
-# dumpGCsWithZ(mN, nN, round_digit=1)
-# dumpGCsWithZ(mP, nP, round_digit=1)
-dumpGCsWithZ<-function(x, y, power=0, theta=1, na.rm=TRUE,
-                                 round_digit=6, names_gc=gc.names)
-{
-  GCs <- greatnessCategories(x, y, power=power, theta=theta, na.rm=na.rm,
-                             names_gc=names_gc)
-  zx <- powerZScores(x, power=power, na.rm=na.rm)
-  zy <- powerZScores(y, power=power, na.rm=na.rm)
-  
-  return(list(
-    GCs=t(GCs),
-    zx=t(round(zx, round_digit)),
-    zy=t(round(zy, round_digit))))
-}
-
 # DSs <- paste0(rep('DS', 6), 0:5)
 # plotTableGCs(nN, mN, DSs)
 # plot.new()
 # plotTableGCs(nP, mP, DSs)
 # plotTableGCs(nP, mP, DSs, cols_gc=gc.cols.bw)
-plotTableGCs <- function(x, y, DSs, power=0,
-                                 arrange=TRUE, theta=1, na.rm=TRUE,
-                                 boldDiagonals=FALSE,
-                                 names_gc=gc.names, cols_gc=gc.cols)
+plotTableGCs <- function(x, y, DSs, power=0, include_power_mean=FALSE,
+                         arrange=TRUE, theta=1, na.rm=TRUE,
+                         boldDiagonals=FALSE,
+                         names_gc=gc.names, cols_gc=gc.cols)
 {
+  # To extract the G-Category from DSX (G-Category, zxy)
+  # Example: DS2 (Skinny, 1.1)
+  # Do not include power mean zx and zy
+  # Example: DS2 (Skinny)
   result <- tabulateGCs(
-    x, y, DSs, power=power, arrange=arrange,
-    theta=theta, na.rm=na.rm, names_gc=names_gc)
-  
-  # result_pure <- gsub("DS.+ \\(|\\)", "", result)
+    x, y, DSs, power=power, theta=theta,
+    include_power_mean=FALSE,
+    arrange=arrange, na.rm=na.rm, names_gc=names_gc)
+
   result_pure <- gsub(".+ \\(|\\)", "", result)
   
   cols <- as.table(matrix('white', nrow(result), ncol(result)))
@@ -368,6 +393,14 @@ plotTableGCs <- function(x, y, DSs, power=0,
     colhead=list(fg_params=list(cex=0.8)),
     rowhead=list(fg_params=list(cex=0.8)))
   
+  if (include_power_mean) {
+    # Nov use the required tabulate style (include_power_mean)
+    result <- tabulateGCs(
+      x, y, DSs, power=power, theta=theta,
+      include_power_mean=include_power_mean,
+      arrange=arrange, na.rm=na.rm, names_gc=names_gc)
+  }
+  
   grobGCs <- tableGrob(result, theme=mytheme)
   
   grid.arrange(grobGCs,
@@ -377,14 +410,14 @@ plotTableGCs <- function(x, y, DSs, power=0,
 }
 
 plotTableGCsDetailed <- function(x, y, DSs, info,
-                                         power=0, theta=1, round_digit=1,
-                                         arrange=TRUE, na.rm=TRUE,
-                                         boldDiagonals=FALSE,
-                                         names_gc=gc.names, cols_gc=gc.cols)
+                                 power=0, theta=1, round_digit=1,
+                                 arrange=TRUE, na.rm=TRUE,
+                                 boldDiagonals=FALSE,
+                                 names_gc=gc.names, cols_gc=gc.cols)
 {
   result <- tabulateGCs(
-    x, y, DSs, power=power, arrange=arrange,
-    theta=theta, na.rm=na.rm, names_gc=names_gc)
+    x, y, DSs, power=power, theta=theta,
+    arrange=arrange, na.rm=na.rm, names_gc=names_gc)
   
   # Extract only G-categories
   # "DS2 (skinny)" -> "skinny"
@@ -422,13 +455,13 @@ plotTableGCsDetailed <- function(x, y, DSs, info,
     
     if (power == 0) {
       interpret <- paste0(
-        '√(Zm*Zn)=', round(sqrt(zy[ind]*zx[ind]), round_digit),
-        ' (Zn/Zm=', round(zy[ind]/zx[ind], round_digit), ')')
+        '√(zm.zn)=', round(sqrt(zy[ind]*zx[ind]), round_digit),
+        ' (zn/zm=', round(zy[ind]/zx[ind], round_digit), ')')
     }
     else if (power > 0 && power <= 1) {
       interpret <- paste0(
-        '(Zm+Zn)/2=', round((zy[ind] + zx[ind])/2.0, round_digit),
-        ' (Zn-Zm=', round(zy[ind] - zx[ind], round_digit), ')')
+        '(zm+zn)/2=', round((zy[ind] + zx[ind])/2.0, round_digit),
+        ' (zn-zm=', round(zy[ind] - zx[ind], round_digit), ')')
     }
     
     inds <- which(result_ds == ds, arr.ind=TRUE)
@@ -474,13 +507,13 @@ plotTableGCsDetailed <- function(x, y, DSs, info,
 }
 
 plotTablesGCsWithZ2x2 <- function(x, y, DSs, power=0, round_digit=1,
-                                        arrange=TRUE, theta=1, na.rm=TRUE,
-                                        boldDiagonals=FALSE,
-                                        names_gc=gc.names, cols_gc=gc.cols)
+                                  arrange=TRUE, theta=1, na.rm=TRUE,
+                                  boldDiagonals=FALSE,
+                                  names_gc=gc.names, cols_gc=gc.cols)
 {
   result <- tabulateGCs(
-    x, y, DSs, power=power, arrange=arrange,
-    theta=theta, na.rm=na.rm, names_gc=names_gc)
+    x, y, DSs, power=power, theta=theta,
+    arrange=arrange, na.rm=na.rm, names_gc=names_gc)
 
   # Extract only G-categories
   # "DS2 (skinny)" -> "skinny"
@@ -583,9 +616,9 @@ plotTablesGCsWithZ2x2 <- function(x, y, DSs, power=0, round_digit=1,
 # plot.new()
 # plotGraphGCs(mN, nN, gcN, DSsN, trans='log10')
 plotGraphGCs<-function(x, y, GCs, DSs,
-                          na.rm=TRUE, draw=TRUE, trans='identity',
-                          subtitle=NULL,
-                          names_gc=gc.names, cols_gc=gc.cols)
+                       na.rm=TRUE, draw=TRUE, trans='identity',
+                       subtitle=NULL,
+                       names_gc=gc.names, cols_gc=gc.cols)
 {
   x_name <- deparse(substitute(x))
   y_name <- deparse(substitute(y))
@@ -618,7 +651,7 @@ plotGraphGCs<-function(x, y, GCs, DSs,
     scale_x_continuous(labels=comma) +
     scale_y_continuous(labels=comma, trans=trans) +
     geom_smooth(span=1, method='loess',
-                linetype='dashed', color='gray', fill='gray90')
+                linetype='dashed', color='gray', fill='gray96')
   
   if (draw)
     p
@@ -648,7 +681,7 @@ plotGraphGCs<-function(x, y, GCs, DSs,
 # mP <- c(399353, 280, 4868, 1000, 1260, 378)
 # GCs <- getGCsOfSpaceSizeCombs(nP, mP)
 getGCsOfSpaceSizeCombs <- function(x, y, power=0, arrange=TRUE, theta=1,
-                                          na.rm=TRUE, names_gc=gc.names)
+                                   na.rm=TRUE, names_gc=gc.names)
 {
   if (na.rm == TRUE) {
     x <- x[is.na(x) == FALSE]
@@ -686,8 +719,9 @@ getGCsOfSpaceSizeCombs <- function(x, y, power=0, arrange=TRUE, theta=1,
 # x1 <- c(1:11)
 # y1 <- seq(110, 10, -10)
 # result <- dumpGCsOfSpaceSizeCombs(x1, y1)
-dumpGCsOfSpaceSizeCombs <- function(x, y, power=0,
-                                    arrange=TRUE, theta=1, na.rm=TRUE, names_gc=gc.names)
+dumpGCsOfSpaceSizeCombs <- function(x, y, power=0, theta=1,
+                                    arrange=TRUE, na.rm=TRUE,
+                                    names_gc=gc.names)
 {
   if (na.rm == TRUE) {
     x <- x[is.na(x) == FALSE]
@@ -729,17 +763,28 @@ dumpGCsOfSpaceSizeCombs <- function(x, y, power=0,
   dim(zy) <- c(ncol, nrow)
   dimnames(zy) <- list(x, y)
   
-  return(list(GCs=t(GCs), zx=t(zx), zy=t(zy)))
+  pmean_zxy <- numeric()
+  
+  if (power == 0) {
+    pmean_zxy <- sqrt(zx*zy)
+  }
+  else {
+    pmean_zxy <- (zx+zy)/2
+  }
+  
+  return(list(GCs=t(GCs), zx=t(zx), zy=t(zy), pmean_zxy=t(pmean_zxy)))
 }
 
-plotTableGCsOfSpaceSizeCombs <- function(x, y, power=0, round_digit=1,
-                            arrange=TRUE, theta=1, na.rm=TRUE,
-                            boldDiagonals=FALSE,
-                            names_gc=gc.names, cols_gc=gc.cols)
+plotTableGCsOfSpaceSizeCombs <- function(
+  x, y, power=0, theta=1, include_power_mean=FALSE,
+  round_digit=1, arrange=TRUE, na.rm=TRUE,
+  boldDiagonals=FALSE,
+  names_gc=gc.names, cols_gc=gc.cols)
 {
-  GCs <- getGCsOfSpaceSizeCombs(
+  result <- dumpGCsOfSpaceSizeCombs(
     x, y, power=power, arrange=arrange,
     theta=theta, na.rm=na.rm, names_gc=names_gc)
+  GCs <- result$GCs
   
   cols <- as.table(matrix('white', nrow(GCs), ncol(GCs)))
   
@@ -762,10 +807,17 @@ plotTableGCsOfSpaceSizeCombs <- function(x, y, power=0, round_digit=1,
   }
   
   mytheme <- gridExtra::ttheme_minimal(
-    core=list(fg_params=list(cex=0.6, fontface=fontfaces),
+    core=list(fg_params=list(cex=0.9, fontface=fontfaces),
               bg_params=list(fill=cols)),
-    colhead=list(fg_params=list(cex=0.7)),
-    rowhead=list(fg_params=list(cex=0.7)))
+    colhead=list(fg_params=list(cex=1.0)),
+    rowhead=list(fg_params=list(cex=1.0)))
+  
+  if (include_power_mean) {
+    GCs <- matrix(paste(GCs, round(result$pmean_zxy, round_digit),
+                        sep=", "), nrow=nrow(GCs), ncol=ncol(GCs),
+                  dimnames=dimnames(GCs))
+    # GCs <- paste0(GCs, ', ', round(result$pmean_zxy, round_digit))
+  }
   
   grobGCs <- tableGrob(GCs, theme=mytheme)
   
