@@ -69,13 +69,15 @@ gc.cols <- c(
 gc.cols.bw <- c(
   '#7F7F7F', '#A6A6A6', '#BFBFBF', '#D9D9D9', '#F2F2F2', 'white')
 
-# See plotGCategories for mark shapes for G-Categories
+# See plotGraphGCs for mark shapes for G-Categories
 
 #' Power: mean types proposed by Gürol Canbek:
 #' Copyright (C) 2017-2018 Gürol Canbek
 
 #' Calculate greatness category of a single dataset of which feature and sample
 #' space size vectors based on a novel method called G-Category.
+
+## Greatness Category ##########################################################
 
 # The method is proposed by Gürol Canbek. See the reference for citation.
 #'
@@ -118,37 +120,37 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
   if (TRUE == is.null(power_stat_x)) {
     power_stat_x <- powerStatistics(x, power=power, na.rm=na.rm)
   }
-  z_score_x <- powerZScore(i, x, power=power, na.rm=na.rm,
+  zx <- powerZScore(i, x, power=power, na.rm=na.rm,
                            power_statistics=power_stat_x)
   
   if (TRUE == is.null(power_stat_y)) {
     power_stat_y <- powerStatistics(y, power=power, na.rm=na.rm)
   }
-  z_score_y <- powerZScore(i, y, power=power, na.rm=na.rm,
+  zy <- powerZScore(i, y, power=power, na.rm=na.rm,
                            power_statistics=power_stat_y)
   
   if (power == 0) {
     # Geometric
-    if (is.na(z_score_x) || is.na(z_score_y)) {
+    if (is.na(zx) || is.na(zy)) {
       gc_type <- gc_na
     }
-    else if (((theta/2 <= z_score_x || z_score_x <= theta) &&
-              (theta/2 <= z_score_y && z_score_y <= theta)) ||
-             ((z_score_x > theta && z_score_x < 2*theta) &&
-              (z_score_y > theta && z_score_y < 2*theta))
+    else if (((theta/2 <= zx || zx <= theta) &&
+              (theta/2 <= zy && zy <= theta)) ||
+             ((zx > theta && zx < 2*theta) &&
+              (zy > theta && zy < 2*theta))
     ) {
       gc_type <- gc_medium
     }
-    else if (z_score_y > theta && z_score_x > theta) {
+    else if (zy > theta && zx > theta) {
       gc_type <- gc_large
     }
-    else if (z_score_y < theta && z_score_x < theta) {
+    else if (zy < theta && zx < theta) {
       gc_type <- gc_small
     }
-    else if ((z_score_y / z_score_x) > theta) {
+    else if ((zy / zx) > theta) {
       gc_type <- gc_skinny
     }
-    else if ((z_score_x / z_score_y) > theta) {
+    else if ((zx / zy) > theta) {
       gc_type <- gc_shallow
     }
     else {
@@ -158,26 +160,26 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
   }
   else if (power > 0 && power <= 1) {
     theta_scaled <- theta*log(2)
-    if (is.na(z_score_x) || is.na(z_score_y)) {
+    if (is.na(zx) || is.na(zy)) {
       gc_type <- gc_na
     }
     else if (
-      (abs(z_score_x) <= theta_scaled || abs(z_score_y) <= theta_scaled) ||
-      ((z_score_x > theta_scaled && z_score_x < 2*theta_scaled) &&
-       (z_score_y > theta_scaled && z_score_y < 2*theta_scaled))
+      (abs(zx) <= theta_scaled || abs(zy) <= theta_scaled) ||
+      ((zx > theta_scaled && zx < 2*theta_scaled) &&
+       (zy > theta_scaled && zy < 2*theta_scaled))
     ) {
       gc_type <- gc_medium
     }
-    else if (z_score_x > theta_scaled && z_score_y > theta_scaled) {
+    else if (zx > theta_scaled && zy > theta_scaled) {
       gc_type <- gc_large
     }
-    else if (z_score_x < theta_scaled && z_score_y < theta_scaled) {
+    else if (zx < theta_scaled && zy < theta_scaled) {
       gc_type <- gc_small
     }
-    else if ((z_score_y - z_score_x) > theta_scaled) {
+    else if ((zy - zx) > theta_scaled) {
       gc_type <- gc_skinny
     }
-    else if ((z_score_x - z_score_y) > theta_scaled) {
+    else if ((zx - zy) > theta_scaled) {
       gc_type <- gc_shallow
     }
     else {
@@ -241,377 +243,9 @@ greatnessCategories <- function(x, y, power=0, theta=1, na.rm=TRUE,
   return (unlist(GCs))
 }
 
-# dumpGCategoriesZScores(mN, nN, round_digit=1)
-# dumpGCategoriesZScores(mP, nP, round_digit=1)
-dumpGCategoriesZScores<-function(x, y, power=0, theta=1, na.rm=TRUE,
-                                 round_digit=6, names_gc=gc.names)
-{
-  GCs <- greatnessCategories(x, y, power=power, theta=theta, na.rm=na.rm,
-                             names_gc=names_gc)
-  zx <- powerZScores(x, power=power, na.rm=na.rm)
-  zy <- powerZScores(y, power=power, na.rm=na.rm)
-  
-  return(list(
-    GCs=t(GCs),
-    zx=t(round(zx, round_digit)),
-    zy=t(round(zy, round_digit))))
-}
-
-plotGCategoriesZScoresSeperated <- function(x, y, DSs, power=0, round_digit=1,
-                                            arrange=TRUE, theta=1, na.rm=TRUE,
-                                            boldDiagonals=FALSE,
-                                            names_gc=gc.names,
-                                            cols_gc=gc.cols)
-{
-  result <- tabulateGreatnessCategories(
-    x, y, DSs, power=power, arrange=arrange,
-    theta=theta, na.rm=na.rm, names_gc=names_gc)
-
-  # Extract only G-categories
-  # "DS2 (skinny)" -> "skinny"
-  # result_gc <- gsub("DS.+ \\(|\\)", "", result)
-  result_gc <- gsub(".+ \\(|\\)", "", result)
-  # Extract only Datasets
-  # "DS2 (skinny)" -> "skinny"
-  result_ds <- gsub(" \\(.+\\)", "", result)
-
-  cols <- as.table(matrix('white', nrow(result), ncol(result)))
-
-  inds <- which(result_gc == names_gc[gc_small], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_small]
-  inds <- which(result_gc == names_gc[gc_skinny], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_skinny]
-  inds <- which(result_gc == names_gc[gc_shallow], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_shallow]
-  inds <- which(result_gc == names_gc[gc_medium], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_medium]
-  inds <- which(result_gc == names_gc[gc_large], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_large]
-
-  fontfaces <- as.table(matrix('plain', nrow(result), ncol(result)))
-  if (boldDiagonals) {
-    inds <- which(row(result) == col(result), arr.ind=T)
-    fontfaces[inds] <- 'bold'
-  }
-
-  mytheme <- gridExtra::ttheme_minimal(
-    core=list(fg_params=list(cex=0.7, fontface=fontfaces),
-                bg_params=list(fill=cols)),
-    colhead=list(fg_params=list(cex=0.8)),
-    rowhead=list(fg_params=list(cex=0.8)))
-
-  grobGC <- tableGrob(result, theme=mytheme)
-  grobGC <- addTitleToGrob(grobGC, 'G-Categories')
-
-  zx <- powerZScores(x, power=power, na.rm=na.rm)
-  zy <- powerZScores(y, power=power, na.rm=na.rm)
-
-  result_zx <- result_ds
-  result_zy <- result_ds
-  interpret <- result_ds
-
-  for (ds in DSs) {
-    zx <- round(zx[which(DSs == ds, arr.ind=TRUE)], round_digit)
-    result_zx[which(result_zx == ds, arr.ind=TRUE)] <- zx
-
-    zy <- round(zy[which(DSs == ds, arr.ind=TRUE)], round_digit)
-    result_zy[which(result_zy == ds, arr.ind=TRUE)] <- zy
-
-    if (power == 0) {
-      interpret[which(interpret == ds, arr.ind=TRUE)] <- paste(
-        round(sqrt(zy/zx), round_digit),
-        '(', round(sqrt(zy*zx), round_digit), ')')
-    }
-    else if (power > 0 && power <= 1) {
-      interpret[which(interpret == ds, arr.ind=TRUE)] <- paste(
-        round(sqrt(zy/zx), round_digit),
-        '(', round((zy + zx)/2.0, round_digit), ')')
-    }
-  }
-
-  x_name <- deparse(substitute(x))
-
-  grobZx <- tableGrob(result_zx, theme=mytheme)
-  grobZx <- addTitleToGrob(grobZx, paste0('z-score (', x_name, ')'))
-
-  y_name <- deparse(substitute(y))
-
-  grobZy <- tableGrob(result_zy, theme=mytheme)
-  grobZy <- addTitleToGrob(grobZy, paste0('z-score (', y_name, ')'))
-
-  grobZyZxRatio <- tableGrob(interpret, theme=mytheme)
-  grobZyZxRatio <- addTitleToGrob(
-    grobZyZxRatio,
-    paste('z-score',
-          ifelse(power == 0,
-                 paste0(y_name, '/', x_name,
-                        ' (G.Mean = [', x_name, '*', y_name, ']^.5)'),
-                 paste0(y_name, '/', x_name,
-                        ' (A.Mean = [', x_name, '+', y_name, ']/2)'))))
-
-  grid.arrange(
-    grobGC, grobZy, grobZx, grobZyZxRatio, ncol=2, nrow=2,
-    layout_matrix=rbind(c(1, 2),
-                        c(3, 4)),
-    top=paste0('G-Categories, zm, zn, and zn/zm ',
-               'with (geometric/aritmetic means) of Data Sets via',
-               powerMeanTypes(power)))
-}
-
-plotGCategoriesZScores <- function(x, y, DSs, info,
-                                   power=0, theta=1, round_digit=1,
-                                   arrange=TRUE, na.rm=TRUE,
-                                   boldDiagonals=FALSE,
-                                   names_gc=gc.names, cols_gc=gc.cols)
-{
-  result <- tabulateGreatnessCategories(
-    x, y, DSs, power=power, arrange=arrange,
-    theta=theta, na.rm=na.rm, names_gc=names_gc)
-  
-  # Extract only G-categories
-  # "DS2 (skinny)" -> "skinny"
-  # result_gc <- gsub("DS.+ \\(|\\)", "", result)
-  result_gc <- gsub(".+ \\(|\\)", "", result)
-  # Extract only Datasets
-  # "DS2 (skinny)" -> "skinny"
-  result_ds <- gsub(" \\(.+\\)", "", result)
-  
-  cols <- as.table(matrix('white', nrow(result), ncol(result)))
-  
-  inds <- which(result_gc == names_gc[gc_small], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_small]
-  inds <- which(result_gc == names_gc[gc_skinny], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_skinny]
-  inds <- which(result_gc == names_gc[gc_shallow], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_shallow]
-  inds <- which(result_gc == names_gc[gc_medium], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_medium]
-  inds <- which(result_gc == names_gc[gc_large], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_large]
-  
-  fontfaces <- as.table(matrix('plain', nrow(result), ncol(result)))
-  if (boldDiagonals) {
-    inds <- which(row(result) == col(result), arr.ind=T)
-    fontfaces[inds] <- 'bold'
-  }
-  
-  zx <- powerZScores(x, power=power, na.rm=na.rm)
-  zy <- powerZScores(y, power=power, na.rm=na.rm)
-  
-  for (ds in DSs) {
-    ind <- which(DSs == ds, arr.ind=TRUE)
-    interpret <- ''
-    
-    if (power == 0) {
-      interpret <- paste0(
-        '√(Zm*Zn)=', round(sqrt(zy[ind]*zx[ind]), round_digit),
-        ' (Zn/Zm=', round(zy[ind]/zx[ind], round_digit), ')')
-    }
-    else if (power > 0 && power <= 1) {
-      interpret <- paste0(
-        '(Zm+Zn)/2=', round((zy[ind] + zx[ind])/2.0, round_digit),
-        ' (Zn-Zm=', round(zy[ind] - zx[ind], round_digit), ')')
-    }
-    
-    inds <- which(result_ds == ds, arr.ind=TRUE)
-    original <- result[inds]
-    more_detailed <- paste0(
-      original,
-      '\nmxn=', x[ind], ' x ', y[ind],
-      ' ZmxZn=', round(zx[ind], round_digit),
-      ' x ', round(zy[ind], round_digit),
-      '\n', interpret
-    )
-    result[inds] <- more_detailed
-  }
-  
-  mytheme <- gridExtra::ttheme_minimal(
-    core=list(fg_params=list(cex=0.65, fontface=fontfaces),
-                bg_params=list(fill=cols)),
-    colhead=list(fg_params=list(cex=0.7)),
-    rowhead=list(fg_params=list(cex=0.7)))
-  
-  grobGC <- tableGrob(result, theme=mytheme)
-  
-  x_name <- deparse(substitute(x))
-  y_name <- deparse(substitute(y))
-  
-  grid.arrange(grobGC,
-               ncol=1, nrow=1,
-               top=paste0('Data Sets\' G-Categories via ',
-                          powerMeanTypes(power), ': ',
-                          info),
-               bottom=paste0(length(DSs), ' datasets, ',
-                          'm (', x_name, ') statistics: min=',
-                          round(min(zx), 1),
-                          ', average=', round(mean(zx), 1),
-                          ', max=', round(max(zx), 1),
-                          '. n (', y_name, ') statistics: min=',
-                          round(min(zy), 1),
-                          ', average=', round(mean(zy), 1),
-                          ', max=', round(max(zy), 1))
-  )
-  
-  return (result)
-}
-
-# Simulation
-# x1 <- c(1:11)
-# y1 <- seq(110, 10, -10)
-# GCs <- greatnesCategoriesCombination(x1, y1)
-# wclip(GCs) # Paste to spreadsheet
-# GCs <- greatnesCategoriesCombination(x1, y1, power=0)
-# wclip(GCs) # Paste to spreadsheet
-# GCs <- greatnesCategoriesCombination(x1, y1, power=1)
-# wclip(GCs) # Paste to spreadsheet
-#
-# Benign (N) data sets
-# nN <- c(84, 94, 83, 99, NA, 118)
-# mN <- c(264303, 254, 310926, 1000, NA, 207865)
-# GCs <- greatnesCategoriesCombination(nN, mN)
-#
-# Malware (P) data sets
-# nP <- c(90, 81, 69, 75, 83, 73)
-# mP <- c(399353, 280, 4868, 1000, 1260, 378)
-# GCs <- greatnesCategoriesCombination(nP, mP)
-greatnesCategoriesCombination <- function(x, y, power=0, arrange=TRUE, theta=1,
-                                          na.rm=TRUE, names_gc=gc.names)
-{
-  if (na.rm == TRUE) {
-    x <- x[is.na(x) == FALSE]
-    y <- y[is.na(y) == FALSE]
-  }
-  
-  ncol <- length(x)
-  nrow <- length(y)
-  xx <- matrix(nrow=nrow, ncol=ncol)
-  yy <- matrix(nrow=nrow, ncol=ncol)
-  
-  if (arrange) {
-    x <- sort(x)
-    y <- sort(y, decreasing=TRUE)
-  }
-  
-  for (i in 1:nrow) {
-    for (j in 1:ncol) {
-      xx[i, j] <- x[i]
-      yy[i, j] <- y[j]
-    }
-  }
-  
-  xx <- as.vector(xx)
-  yy <- as.vector(yy)
-  GCs <- greatnessCategories(xx, yy, power=power, theta=theta, na.rm=na.rm,
-                             names_gc=names_gc)
-  
-  dim(GCs) <- c(ncol, nrow)
-  dimnames(GCs) <- list(x, y)
-  
-  return(t(GCs))
-}
-
-# x1 <- c(1:11)
-# y1 <- seq(110, 10, -10)
-# result <- dumpAllDSCombinationGCs(x1, y1)
-dumpAllDSCombinationGCs <- function(x, y, power=0,
-                                    arrange=TRUE, theta=1, na.rm=TRUE, names_gc=gc.names)
-{
-  if (na.rm == TRUE) {
-    x <- x[is.na(x) == FALSE]
-    y <- y[is.na(y) == FALSE]
-  }
-  
-  ncol <- length(x)
-  nrow <- length(y)
-  xx <- matrix(nrow=nrow, ncol=ncol)
-  yy <- matrix(nrow=nrow, ncol=ncol)
-  
-  if (arrange) {
-    x <- sort(x)
-    y <- sort(y, decreasing=TRUE)
-  }
-  
-  for (i in 1:nrow) {
-    for (j in 1:ncol) {
-      xx[i, j] <- x[i]
-      yy[i, j] <- y[j]
-    }
-  }
-  
-  xx <- as.vector(xx)
-  yy <- as.vector(yy)
-  GCs <- greatnessCategories(x=xx, y=yy, power=power, theta=theta, na.rm=na.rm,
-                             names_gc=names_gc)
-  
-  dim(GCs) <- c(ncol, nrow)
-  dimnames(GCs) <- list(x, y)
-  
-  zx <- powerZScores(x=xx, power=power, na.rm=na.rm)
-  
-  dim(zx) <- c(ncol, nrow)
-  dimnames(zx) <- list(x, y)
-  
-  zy <- powerZScores(x=yy, power=power, na.rm=na.rm)
-  
-  dim(zy) <- c(ncol, nrow)
-  dimnames(zy) <- list(x, y)
-  
-  return(list(GCs=t(GCs), zx=t(zx), zy=t(zy)))
-}
-
-# DSs <- paste0(rep('DS', 6), 0:5)
-# plotGCategoriesTable(nN, mN, DSs)
-# plot.new()
-# plotGCategoriesTable(nP, mP, DSs)
-# plotGCategoriesTable(nP, mP, DSs, cols_gc=gc.cols.bw)
-plotGCategoriesTable <- function(x, y, DSs, power=0,
-                                 arrange=TRUE, theta=1, na.rm=TRUE,
-                                 boldDiagonals=FALSE,
-                                 names_gc=gc.names, cols_gc=gc.cols)
-{
-  result <- tabulateGreatnessCategories(
-    x, y, DSs, power=power, arrange=arrange,
-    theta=theta, na.rm=na.rm, names_gc=names_gc)
-  
-  # result_pure <- gsub("DS.+ \\(|\\)", "", result)
-  result_pure <- gsub(".+ \\(|\\)", "", result)
-  
-  cols <- as.table(matrix('white', nrow(result), ncol(result)))
-  
-  inds <- which(result_pure == names_gc[gc_small], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_small]
-  inds <- which(result_pure == names_gc[gc_skinny], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_skinny]
-  inds <- which(result_pure == names_gc[gc_shallow], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_shallow]
-  inds <- which(result_pure == names_gc[gc_medium], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_medium]
-  inds <- which(result_pure == names_gc[gc_large], arr.ind=TRUE)
-  cols[inds] <- cols_gc[gc_large]
-  
-  fontfaces <- as.table(matrix('plain', nrow(result), ncol(result)))
-  if (boldDiagonals) {
-    inds <- which(row(result) == col(result), arr.ind=T)
-    fontfaces[inds] <- 'bold'
-  }
-  
-  mytheme <- gridExtra::ttheme_minimal(
-    core=list(fg_params=list(cex=0.7, fontface=fontfaces),
-              bg_params=list(fill=cols)),
-    colhead=list(fg_params=list(cex=0.8)),
-    rowhead=list(fg_params=list(cex=0.8)))
-  
-  grobGCs <- tableGrob(result, theme=mytheme)
-  
-  grid.arrange(grobGCs,
-               ncol=1, nrow=1,
-               top=paste('Data Sets\' G-Categories via',
-                         powerMeanTypes(power)))
-}
-
-# tabulateGreatnessCategories(nN, mN, DSs)
-# tabulateGreatnessCategories(nP, mP, DSs)
-tabulateGreatnessCategories <- function(
+# tabulateGCs(nN, mN, DSs)
+# tabulateGCs(nP, mP, DSs)
+tabulateGCs <- function(
   x, y, DSs, power=0, arrange=TRUE, theta=1, na.rm=TRUE, names_gc=gc.names)
 {
   NA_DSs <- DSs[is.na(y) == TRUE]
@@ -676,12 +310,434 @@ tabulateGreatnessCategories <- function(
   return (xy)
 }
 
-plotCombination <- function(x, y, power=0, round_digit=1,
+# dumpGCsWithZ(mN, nN, round_digit=1)
+# dumpGCsWithZ(mP, nP, round_digit=1)
+dumpGCsWithZ<-function(x, y, power=0, theta=1, na.rm=TRUE,
+                                 round_digit=6, names_gc=gc.names)
+{
+  GCs <- greatnessCategories(x, y, power=power, theta=theta, na.rm=na.rm,
+                             names_gc=names_gc)
+  zx <- powerZScores(x, power=power, na.rm=na.rm)
+  zy <- powerZScores(y, power=power, na.rm=na.rm)
+  
+  return(list(
+    GCs=t(GCs),
+    zx=t(round(zx, round_digit)),
+    zy=t(round(zy, round_digit))))
+}
+
+# DSs <- paste0(rep('DS', 6), 0:5)
+# plotTableGCs(nN, mN, DSs)
+# plot.new()
+# plotTableGCs(nP, mP, DSs)
+# plotTableGCs(nP, mP, DSs, cols_gc=gc.cols.bw)
+plotTableGCs <- function(x, y, DSs, power=0,
+                                 arrange=TRUE, theta=1, na.rm=TRUE,
+                                 boldDiagonals=FALSE,
+                                 names_gc=gc.names, cols_gc=gc.cols)
+{
+  result <- tabulateGCs(
+    x, y, DSs, power=power, arrange=arrange,
+    theta=theta, na.rm=na.rm, names_gc=names_gc)
+  
+  # result_pure <- gsub("DS.+ \\(|\\)", "", result)
+  result_pure <- gsub(".+ \\(|\\)", "", result)
+  
+  cols <- as.table(matrix('white', nrow(result), ncol(result)))
+  
+  inds <- which(result_pure == names_gc[gc_small], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_small]
+  inds <- which(result_pure == names_gc[gc_skinny], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_skinny]
+  inds <- which(result_pure == names_gc[gc_shallow], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_shallow]
+  inds <- which(result_pure == names_gc[gc_medium], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_medium]
+  inds <- which(result_pure == names_gc[gc_large], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_large]
+  
+  fontfaces <- as.table(matrix('plain', nrow(result), ncol(result)))
+  if (boldDiagonals) {
+    inds <- which(row(result) == col(result), arr.ind=T)
+    fontfaces[inds] <- 'bold'
+  }
+  
+  mytheme <- gridExtra::ttheme_minimal(
+    core=list(fg_params=list(cex=0.7, fontface=fontfaces),
+              bg_params=list(fill=cols)),
+    colhead=list(fg_params=list(cex=0.8)),
+    rowhead=list(fg_params=list(cex=0.8)))
+  
+  grobGCs <- tableGrob(result, theme=mytheme)
+  
+  grid.arrange(grobGCs,
+               ncol=1, nrow=1,
+               top=paste('Data Sets\' G-Categories via',
+                         powerMeanTypes(power)))
+}
+
+plotTableGCsDetailed <- function(x, y, DSs, info,
+                                         power=0, theta=1, round_digit=1,
+                                         arrange=TRUE, na.rm=TRUE,
+                                         boldDiagonals=FALSE,
+                                         names_gc=gc.names, cols_gc=gc.cols)
+{
+  result <- tabulateGCs(
+    x, y, DSs, power=power, arrange=arrange,
+    theta=theta, na.rm=na.rm, names_gc=names_gc)
+  
+  # Extract only G-categories
+  # "DS2 (skinny)" -> "skinny"
+  # result_gc <- gsub("DS.+ \\(|\\)", "", result)
+  result_gc <- gsub(".+ \\(|\\)", "", result)
+  # Extract only Datasets
+  # "DS2 (skinny)" -> "skinny"
+  result_ds <- gsub(" \\(.+\\)", "", result)
+  
+  cols <- as.table(matrix('white', nrow(result), ncol(result)))
+  
+  inds <- which(result_gc == names_gc[gc_small], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_small]
+  inds <- which(result_gc == names_gc[gc_skinny], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_skinny]
+  inds <- which(result_gc == names_gc[gc_shallow], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_shallow]
+  inds <- which(result_gc == names_gc[gc_medium], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_medium]
+  inds <- which(result_gc == names_gc[gc_large], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_large]
+  
+  fontfaces <- as.table(matrix('plain', nrow(result), ncol(result)))
+  if (boldDiagonals) {
+    inds <- which(row(result) == col(result), arr.ind=T)
+    fontfaces[inds] <- 'bold'
+  }
+  
+  zx <- powerZScores(x, power=power, na.rm=na.rm)
+  zy <- powerZScores(y, power=power, na.rm=na.rm)
+  
+  for (ds in DSs) {
+    ind <- which(DSs == ds, arr.ind=TRUE)
+    interpret <- ''
+    
+    if (power == 0) {
+      interpret <- paste0(
+        '√(Zm*Zn)=', round(sqrt(zy[ind]*zx[ind]), round_digit),
+        ' (Zn/Zm=', round(zy[ind]/zx[ind], round_digit), ')')
+    }
+    else if (power > 0 && power <= 1) {
+      interpret <- paste0(
+        '(Zm+Zn)/2=', round((zy[ind] + zx[ind])/2.0, round_digit),
+        ' (Zn-Zm=', round(zy[ind] - zx[ind], round_digit), ')')
+    }
+    
+    inds <- which(result_ds == ds, arr.ind=TRUE)
+    original <- result[inds]
+    more_detailed <- paste0(
+      original,
+      '\nmxn=', x[ind], ' x ', y[ind],
+      ' ZmxZn=', round(zx[ind], round_digit),
+      ' x ', round(zy[ind], round_digit),
+      '\n', interpret
+    )
+    result[inds] <- more_detailed
+  }
+  
+  mytheme <- gridExtra::ttheme_minimal(
+    core=list(fg_params=list(cex=0.65, fontface=fontfaces),
+              bg_params=list(fill=cols)),
+    colhead=list(fg_params=list(cex=0.7)),
+    rowhead=list(fg_params=list(cex=0.7)))
+  
+  grobGC <- tableGrob(result, theme=mytheme)
+  
+  x_name <- deparse(substitute(x))
+  y_name <- deparse(substitute(y))
+  
+  grid.arrange(grobGC,
+               ncol=1, nrow=1,
+               top=paste0('Data Sets\' G-Categories via ',
+                          powerMeanTypes(power), ': ',
+                          info),
+               bottom=paste0(length(DSs), ' datasets, ',
+                             'm (', x_name, ') statistics: min=',
+                             round(min(zx), 1),
+                             ', average=', round(mean(zx), 1),
+                             ', max=', round(max(zx), 1),
+                             '. n (', y_name, ') statistics: min=',
+                             round(min(zy), 1),
+                             ', average=', round(mean(zy), 1),
+                             ', max=', round(max(zy), 1))
+  )
+  
+  return (result)
+}
+
+plotTablesGCsWithZ2x2 <- function(x, y, DSs, power=0, round_digit=1,
+                                        arrange=TRUE, theta=1, na.rm=TRUE,
+                                        boldDiagonals=FALSE,
+                                        names_gc=gc.names, cols_gc=gc.cols)
+{
+  result <- tabulateGCs(
+    x, y, DSs, power=power, arrange=arrange,
+    theta=theta, na.rm=na.rm, names_gc=names_gc)
+
+  # Extract only G-categories
+  # "DS2 (skinny)" -> "skinny"
+  # result_gc <- gsub("DS.+ \\(|\\)", "", result)
+  result_gc <- gsub(".+ \\(|\\)", "", result)
+  # Extract only Datasets
+  # "DS2 (skinny)" -> "skinny"
+  result_ds <- gsub(" \\(.+\\)", "", result)
+
+  cols <- as.table(matrix('white', nrow(result), ncol(result)))
+
+  inds <- which(result_gc == names_gc[gc_small], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_small]
+  inds <- which(result_gc == names_gc[gc_skinny], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_skinny]
+  inds <- which(result_gc == names_gc[gc_shallow], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_shallow]
+  inds <- which(result_gc == names_gc[gc_medium], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_medium]
+  inds <- which(result_gc == names_gc[gc_large], arr.ind=TRUE)
+  cols[inds] <- cols_gc[gc_large]
+
+  fontfaces <- as.table(matrix('plain', nrow(result), ncol(result)))
+  if (boldDiagonals) {
+    inds <- which(row(result) == col(result), arr.ind=T)
+    fontfaces[inds] <- 'bold'
+  }
+
+  mytheme <- gridExtra::ttheme_minimal(
+    core=list(fg_params=list(cex=0.7, fontface=fontfaces),
+                bg_params=list(fill=cols)),
+    colhead=list(fg_params=list(cex=0.8)),
+    rowhead=list(fg_params=list(cex=0.8)))
+
+  grobGC <- tableGrob(result, theme=mytheme)
+  grobGC <- addTitleToGrob(grobGC, 'G-Categories')
+
+  zx <- powerZScores(x, power=power, na.rm=na.rm)
+  zy <- powerZScores(y, power=power, na.rm=na.rm)
+
+  result_zx <- result_ds
+  result_zy <- result_ds
+  interpret <- result_ds
+
+  for (ds in DSs) {
+    zx_value <- round(zx[which(DSs == ds, arr.ind=TRUE)], round_digit)
+    result_zx[which(result_zx == ds, arr.ind=TRUE)] <- zx_value
+
+    zy_value <- round(zy[which(DSs == ds, arr.ind=TRUE)], round_digit)
+    result_zy[which(result_zy == ds, arr.ind=TRUE)] <- zy_value
+
+    if (power == 0) {
+      interpret[which(interpret == ds, arr.ind=TRUE)] <- paste(
+        round(sqrt(zy_value/zx_value), round_digit),
+        '(', round(sqrt(zy_value*zx_value), round_digit), ')')
+    }
+    else if (power > 0 && power <= 1) {
+      interpret[which(interpret == ds, arr.ind=TRUE)] <- paste(
+        round(sqrt(zy_value/zx_value), round_digit),
+        '(', round((zy_value + zx_value)/2.0, round_digit), ')')
+    }
+  }
+
+  x_name <- deparse(substitute(x))
+
+  grobZx <- tableGrob(result_zx, theme=mytheme)
+  grobZx <- addTitleToGrob(grobZx, paste0('z-score (', x_name, ')'))
+
+  y_name <- deparse(substitute(y))
+
+  grobZy <- tableGrob(result_zy, theme=mytheme)
+  grobZy <- addTitleToGrob(grobZy, paste0('z-score (', y_name, ')'))
+
+  grobZyZxRatio <- tableGrob(interpret, theme=mytheme)
+  grobZyZxRatio <- addTitleToGrob(
+    grobZyZxRatio,
+    paste('z-score',
+          ifelse(power == 0,
+                 paste0(y_name, '/', x_name,
+                        ' (G.Mean = [', x_name, '*', y_name, ']^.5)'),
+                 paste0(y_name, '/', x_name,
+                        ' (A.Mean = [', x_name, '+', y_name, ']/2)'))))
+
+  grid.arrange(
+    grobGC, grobZy, grobZx, grobZyZxRatio, ncol=2, nrow=2,
+    layout_matrix=rbind(c(1, 2),
+                        c(3, 4)),
+    top=paste0('G-Categories, zm, zn, and zn/zm ',
+               'with (geometric/aritmetic means) of Data Sets via',
+               powerMeanTypes(power)))
+}
+
+# DSsP <- paste0(rep('DS', 6), 0:5)
+# plotGraphGCs(mP, nP, gcP, DSsP)
+# plot.new()
+# DSsN <- paste0(rep('DS', 6), 0:5)[-5]
+# plotGraphGCs(mN, nN, gcN, DSsN)
+# sample size (m) logaritmic scale
+# plotGraphGCs(mP, nP, gcP, DSsP, trans='log10')
+# plot.new()
+# plotGraphGCs(mN, nN, gcN, DSsN, trans='log10')
+plotGraphGCs<-function(x, y, GCs, DSs,
+                          na.rm=TRUE, draw=TRUE, trans='identity',
+                          subtitle=NULL,
+                          names_gc=gc.names, cols_gc=gc.cols)
+{
+  x_name <- deparse(substitute(x))
+  y_name <- deparse(substitute(y))
+  
+  if (na.rm == TRUE) {
+    x <- x[is.na(x) == FALSE]
+    y <- y[is.na(y) == FALSE]
+  }
+  
+  ds_dist <- cbind.data.frame(x, y, GCs, DSs)
+  
+  # 1:Small, 2:Medium, 3:Shallow, 4:Skinny, 5:Large, 6:NA
+  #                1   2   3               4               5   6
+  mark_shapes <- c(15, 15, charToRaw('-'), charToRaw('|'), 15, 8)
+  names(mark_shapes) <- names_gc
+  mark_colors <- cols_gc
+  names(mark_colors) <- names_gc
+  #               1  2  3  4  5  6
+  mark_sizes <- c(3, 6, 17, 9, 9, 9)
+  names(mark_sizes) <- names_gc
+  
+  p <- ggplot(ds_dist, aes(x=x, y=y)) +
+    scale_shape_manual(values=mark_shapes) +
+    scale_color_manual(values=mark_colors) +
+    scale_size_manual(values=mark_sizes) +
+    theme_bw() +
+    labs(x=x_name, y=y_name, subtitle=subtitle) +
+    geom_point(aes(shape=GCs, size=GCs, color=GCs)) +
+    geom_text(aes(label=DSs, hjust=0.5, vjust=-2), size=4) +
+    scale_x_continuous(labels=comma) +
+    scale_y_continuous(labels=comma, trans=trans) +
+    geom_smooth(span=1, method='loess',
+                linetype='dashed', color='gray', fill='gray90')
+  
+  if (draw)
+    p
+  else
+    return(p)
+}
+
+## G-Category for Two Space Combinations #######################################
+
+# Simulation
+# x1 <- c(1:11)
+# y1 <- seq(110, 10, -10)
+# GCs <- getGCsOfSpaceSizeCombs(x1, y1)
+# wclip(GCs) # Paste to spreadsheet
+# GCs <- getGCsOfSpaceSizeCombs(x1, y1, power=0)
+# wclip(GCs) # Paste to spreadsheet
+# GCs <- getGCsOfSpaceSizeCombs(x1, y1, power=1)
+# wclip(GCs) # Paste to spreadsheet
+#
+# Benign (N) data sets
+# nN <- c(84, 94, 83, 99, NA, 118)
+# mN <- c(264303, 254, 310926, 1000, NA, 207865)
+# GCs <- getGCsOfSpaceSizeCombs(nN, mN)
+#
+# Malware (P) data sets
+# nP <- c(90, 81, 69, 75, 83, 73)
+# mP <- c(399353, 280, 4868, 1000, 1260, 378)
+# GCs <- getGCsOfSpaceSizeCombs(nP, mP)
+getGCsOfSpaceSizeCombs <- function(x, y, power=0, arrange=TRUE, theta=1,
+                                          na.rm=TRUE, names_gc=gc.names)
+{
+  if (na.rm == TRUE) {
+    x <- x[is.na(x) == FALSE]
+    y <- y[is.na(y) == FALSE]
+  }
+  
+  ncol <- length(x)
+  nrow <- length(y)
+  xx <- matrix(nrow=nrow, ncol=ncol)
+  yy <- matrix(nrow=nrow, ncol=ncol)
+  
+  if (arrange) {
+    x <- sort(x)
+    y <- sort(y, decreasing=TRUE)
+  }
+  
+  for (i in 1:nrow) {
+    for (j in 1:ncol) {
+      xx[i, j] <- x[i]
+      yy[i, j] <- y[j]
+    }
+  }
+  
+  xx <- as.vector(xx)
+  yy <- as.vector(yy)
+  GCs <- greatnessCategories(xx, yy, power=power, theta=theta, na.rm=na.rm,
+                             names_gc=names_gc)
+  
+  dim(GCs) <- c(ncol, nrow)
+  dimnames(GCs) <- list(x, y)
+  
+  return(t(GCs))
+}
+
+# x1 <- c(1:11)
+# y1 <- seq(110, 10, -10)
+# result <- dumpGCsOfSpaceSizeCombs(x1, y1)
+dumpGCsOfSpaceSizeCombs <- function(x, y, power=0,
+                                    arrange=TRUE, theta=1, na.rm=TRUE, names_gc=gc.names)
+{
+  if (na.rm == TRUE) {
+    x <- x[is.na(x) == FALSE]
+    y <- y[is.na(y) == FALSE]
+  }
+  
+  ncol <- length(x)
+  nrow <- length(y)
+  xx <- matrix(nrow=nrow, ncol=ncol)
+  yy <- matrix(nrow=nrow, ncol=ncol)
+  
+  if (arrange) {
+    x <- sort(x)
+    y <- sort(y, decreasing=TRUE)
+  }
+  
+  for (i in 1:nrow) {
+    for (j in 1:ncol) {
+      xx[i, j] <- x[i]
+      yy[i, j] <- y[j]
+    }
+  }
+  
+  xx <- as.vector(xx)
+  yy <- as.vector(yy)
+  GCs <- greatnessCategories(x=xx, y=yy, power=power, theta=theta, na.rm=na.rm,
+                             names_gc=names_gc)
+  
+  dim(GCs) <- c(ncol, nrow)
+  dimnames(GCs) <- list(x, y)
+  
+  zx <- powerZScores(x=xx, power=power, na.rm=na.rm)
+  
+  dim(zx) <- c(ncol, nrow)
+  dimnames(zx) <- list(x, y)
+  
+  zy <- powerZScores(x=yy, power=power, na.rm=na.rm)
+  
+  dim(zy) <- c(ncol, nrow)
+  dimnames(zy) <- list(x, y)
+  
+  return(list(GCs=t(GCs), zx=t(zx), zy=t(zy)))
+}
+
+plotTableGCsOfSpaceSizeCombs <- function(x, y, power=0, round_digit=1,
                             arrange=TRUE, theta=1, na.rm=TRUE,
                             boldDiagonals=FALSE,
                             names_gc=gc.names, cols_gc=gc.cols)
 {
-  GCs <- greatnesCategoriesCombination(
+  GCs <- getGCsOfSpaceSizeCombs(
     x, y, power=power, arrange=arrange,
     theta=theta, na.rm=na.rm, names_gc=names_gc)
   
@@ -720,12 +776,12 @@ plotCombination <- function(x, y, power=0, round_digit=1,
                          powerMeanTypes(power)))
 }
 
-plotCombinationAll <- function(x, y, power=0, round_digit=1,
+plotTablesGCsOfSpaceSizeCombs2x2 <- function(x, y, power=0, round_digit=1,
                                arrange=TRUE, theta=1, na.rm=TRUE,
                                boldDiagonals=FALSE,
                                names_gc=gc.names, cols_gc=gc.cols)
 {
-  result <- dumpAllDSCombinationGCs(x, y, power=power, arrange=arrange,
+  result <- dumpGCsOfSpaceSizeCombs(x, y, power=power, arrange=arrange,
                                     theta=theta, na.rm=na.rm, names_gc=names_gc)
   
   cols <- as.table(matrix('white', nrow(result$GCs), ncol(result$GCs)))
@@ -800,6 +856,8 @@ plotCombinationAll <- function(x, y, power=0, round_digit=1,
                          powerMeanTypes(power)))
 }
 
+## Other #######################################################################
+
 addTitleToGrob<-function(grob, title, fontsize=12)
 {
   padding <- unit(1, 'line')
@@ -810,58 +868,4 @@ addTitleToGrob<-function(grob, title, fontsize=12)
   grob$layout$clip <- 'off'
   
   return (grob)
-}
-
-
-# DSsP <- paste0(rep('DS', 6), 0:5)
-# plotGCategories(mP, nP, gcP, DSsP)
-# plot.new()
-# DSsN <- paste0(rep('DS', 6), 0:5)[-5]
-# plotGCategories(mN, nN, gcN, DSsN)
-# sample size (m) logaritmic scale
-# plotGCategories(mP, nP, gcP, DSsP, trans='log10')
-# plot.new()
-# plotGCategories(mN, nN, gcN, DSsN, trans='log10')
-plotGCategories<-function(x, y, GCs, DSs,
-                          na.rm=TRUE, draw=TRUE, trans='identity',
-                          subtitle=NULL,
-                          names_gc=gc.names, cols_gc=gc.cols)
-{
-  x_name <- deparse(substitute(x))
-  y_name <- deparse(substitute(y))
-  
-  if (na.rm == TRUE) {
-    x <- x[is.na(x) == FALSE]
-    y <- y[is.na(y) == FALSE]
-  }
-  
-  ds_dist <- cbind.data.frame(x, y, GCs, DSs)
-  
-  # 1:Small, 2:Medium, 3:Shallow, 4:Skinny, 5:Large, 6:NA
-  #                1   2   3               4               5   6
-  mark_shapes <- c(15, 15, charToRaw('-'), charToRaw('|'), 15, 8)
-  names(mark_shapes) <- names_gc
-  mark_colors <- cols_gc
-  names(mark_colors) <- names_gc
-  #               1  2  3  4  5  6
-  mark_sizes <- c(3, 6, 17, 9, 9, 9)
-  names(mark_sizes) <- names_gc
-  
-  p <- ggplot(ds_dist, aes(x=x, y=y)) +
-    scale_shape_manual(values=mark_shapes) +
-    scale_color_manual(values=mark_colors) +
-    scale_size_manual(values=mark_sizes) +
-    theme_bw() +
-    labs(x=x_name, y=y_name, subtitle=subtitle) +
-    geom_point(aes(shape=GCs, size=GCs, color=GCs)) +
-    geom_text(aes(label=DSs, hjust=0.5, vjust=-2), size=4) +
-    scale_x_continuous(labels=comma) +
-    scale_y_continuous(labels=comma, trans=trans) +
-    geom_smooth(span=1, method='loess',
-                linetype='dashed', color='gray', fill='gray90')
-  
-  if (draw)
-    p
-  else
-    return(p)
 }
