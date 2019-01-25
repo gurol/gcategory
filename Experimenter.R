@@ -44,31 +44,39 @@ loadTestData <- function(count_ds=9) {
   nMalware <<- c(1260, 5555, 23743, 1929, 4725, 2421)
 }
 
-processDsConfiguration <- function(n, m, dss, show_ds_info,
-                                   info,
-                                   n_name, m_name, power, power_method, theta,
-                                   fig_1_name,
-                                   width_1, height_1,
-                                   fig_2_name, fig_3_name,
-                                   tab_name,
-                                   plot_to_file, y_transform) {
+processDsConfiguration <- function(
+  m, n, dss, show_ds_info,
+  info,
+  n_name, m_name, power, power_method, theta,
+  fig_1_name,
+  width_1, height_1,
+  fig_2_name, fig_3_name,
+  tab_name,
+  plot_to_file, y_transform,
+  names_gc=gc.names, cols_gc=gc.cols) {
   # Display information about the data sets
   if (show_ds_info) {
     cat(paste0(
       'Testing for ',
       length(dss), ' Data Sets:\n   ', paste(dss, collapse='\t'),
-      '\nwith Sample Space Sizes (m):\n   ', paste(m, collapse='\t'),
-      '\nwith Feature Space Sizes (m):\n   ', paste(n, collapse='\t'), '\n\n'
+      '\nwith Sample Space Sizes (n):\n   ', paste(n, collapse='\t'),
+      '\nwith Feature Space Sizes (m):\n   ', paste(m, collapse='\t'), '\n\n'
     ))  
   }
   
   # Figure: Data Sets' G-Categories with Z-scores
-  cat(paste0('G-Categories calculated via ', power_method, ifelse(power==0, ' (correct) approach. See the files having "geo" in names.\n', ' (erroneous) approach. See the files having "ari" in names.\n')))
+  cat(paste0(
+    'G-Categories calculated via ', power_method,
+    ifelse(power==0,
+           ' (correct) approach.\n   See the files having "geo" in their names.\n',
+           ' (erroneous) approach.\n   See the files having "ari" in their names.\n'
+           )))
   
   if (plot_to_file) {
     png(filename=fig_1_name, width=width_1, height=height_1, units='cm', res=300)
   }
-  result <- plotGCategoriesZScores(n, m, dss, info, power=power, theta=theta)
+  result <- plotTableGCsDetailed(m, n, dss, info, power=power, theta=theta,
+                                 names_gc=names_gc, cols_gc=cols_gc)
   
   if (plot_to_file) {
     dev.off()
@@ -86,15 +94,16 @@ processDsConfiguration <- function(n, m, dss, show_ds_info,
   }
   
   print(
-    plotGCategories(
-      n, m,
-      greatnessCategories(n, m, power=power, theta=theta),
+    plotGraphGCs(
+      m, n,
+      greatnessCategories(m, n, power=power, theta=theta),
       dss, trans=y_transform,
       subtitle=paste('G-Categories of the data sets with', info,
                      '\nCalculated via', powerMeanTypes(power),
                      ifelse(y_transform == 'log10',
                             'sample space is drawn in logarithmic scale', '')
-                     )
+                     ),
+      names_gc=names_gc, cols_gc=cols_gc
     )
   )
   
@@ -107,43 +116,53 @@ processDsConfiguration <- function(n, m, dss, show_ds_info,
     png(filename=fig_3_name, width=45, height=20, units='cm', res=300)
   }
   
-  result <- plotCombination(n, m, power=power, theta=theta)
+  result <- plotTableGCsOfSpaceSizeCombs(m, n, power=power, theta=theta,
+                                         names_gc=names_gc, cols_gc=cols_gc)
   
   if (plot_to_file) {
     dev.off()
   }
 }
 
-greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
+testGreatnessCategory <- function(power_1=1, power_2=0, theta=1,
+                                  names_gc=gc.names, cols_gc=gc.cols,
                                   plot_to_file=FALSE, dir_parent='../results/') {
+  if (exists('x1') == FALSE) {
+    loadTestData()
+  }
+  
   count_conf <- length(infos)
   # 1) x1 and y1
   conf <- 1
   cat(paste0('Configuration ', conf, '/', count_conf, ': ', infos[conf], '\n'))
   cat('********************************************************************************\n')
   dss <- paste0(rep('DS', length(x1)), 1:length(x1))
-  processDsConfiguration(m=x1, n=y1, dss=dss, show_ds_info=TRUE,
-                         info=infos[conf],
-                         n_name='nLin', m_name='mLin',
-                         power=power_1, power_method='Arithmetic', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], '1ari_aLinearDSSizes.png'),
-                         width_1=45, height_1=15,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], '1ari_bLinearDSSizeGraph.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], '1ari_cLinearDSSizeCombination.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], '1ari_dLinearDSSizes.csv'),
-                         plot_to_file=plot_to_file, y_transform='identity'
+  processDsConfiguration(
+    m=x1, n=y1, dss=dss, show_ds_info=TRUE,
+    info=infos[conf],
+    n_name='nLin', m_name='mLin',
+    power=power_1, power_method='Arithmetic', theta=theta,
+    fig_1_name=paste0(dir_parent, dir_sub[conf], '1ari_aLinearDSSizes.png'),
+    width_1=45, height_1=15,
+    fig_2_name=paste0(dir_parent, dir_sub[conf], '1ari_bLinearDSSizeGraph.png'),
+    fig_3_name=paste0(dir_parent, dir_sub[conf], '1ari_cLinearDSSizeCombination.png'),
+    tab_name=paste0(dir_parent, dir_sub[conf], '1ari_dLinearDSSizes.csv'),
+    plot_to_file=plot_to_file, y_transform='identity',
+    names_gc=names_gc, cols_gc=cols_gc
   )
   
-  processDsConfiguration(m=x1, n=y1, dss=dss, show_ds_info=FALSE,
-                         info=infos[conf],
-                         n_name='nLin', m_name='mLin',
-                         power=power_2, power_method='Geometric', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], '1geo_aLinearDSSizes.png'),
-                         width_1=45, height_1=15,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], '1geo_bLinearDSSizeGraph.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], '1geo_cLinearDSSizeCombination.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], '1geo_dLinearDSSizes.csv'),
-                         plot_to_file=plot_to_file, y_transform='identity'
+  processDsConfiguration(
+    m=x1, n=y1, dss=dss, show_ds_info=FALSE,
+    info=infos[conf],
+    n_name='nLin', m_name='mLin',
+    power=power_2, power_method='Geometric', theta=theta,
+    fig_1_name=paste0(dir_parent, dir_sub[conf], '1geo_aLinearDSSizes.png'),
+    width_1=45, height_1=15,
+    fig_2_name=paste0(dir_parent, dir_sub[conf], '1geo_bLinearDSSizeGraph.png'),
+    fig_3_name=paste0(dir_parent, dir_sub[conf], '1geo_cLinearDSSizeCombination.png'),
+    tab_name=paste0(dir_parent, dir_sub[conf], '1geo_dLinearDSSizes.csv'),
+    plot_to_file=plot_to_file, y_transform='identity',
+    names_gc=names_gc, cols_gc=cols_gc
   )
   
   # 2) xr1 and yr1
@@ -151,28 +170,32 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
   cat(paste0('\n\nConfiguration ', conf, '/', count_conf, ': ', infos[conf], '\n'))
   cat('********************************************************************************\n')
   dss <- paste0(rep('DS', length(xr1)), 1:length(xr1))
-  processDsConfiguration(m=xr1, n=yr1, dss=dss, show_ds_info=TRUE,
-                         info=infos[conf],
-                         n_name='nRnd', m_name='mRnd',
-                         power=power_1, power_method='Arithmetic', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], '2ari_aRandomDSSizes.png'),
-                         width_1=30, height_1=15,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], '2ari_bRandomDSSizeGraph.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], '2ari_cRandomDSSizeCombination.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], '2ari_dRandomDSSizes.csv'),
-                         plot_to_file=plot_to_file, y_transform='identity'
+  processDsConfiguration(
+    m=xr1, n=yr1, dss=dss, show_ds_info=TRUE,
+    info=infos[conf],
+    n_name='nRnd', m_name='mRnd',
+    power=power_1, power_method='Arithmetic', theta=theta,
+    fig_1_name=paste0(dir_parent, dir_sub[conf], '2ari_aRandomDSSizes.png'),
+    width_1=30, height_1=15,
+    fig_2_name=paste0(dir_parent, dir_sub[conf], '2ari_bRandomDSSizeGraph.png'),
+    fig_3_name=paste0(dir_parent, dir_sub[conf], '2ari_cRandomDSSizeCombination.png'),
+    tab_name=paste0(dir_parent, dir_sub[conf], '2ari_dRandomDSSizes.csv'),
+    plot_to_file=plot_to_file, y_transform='identity',
+    names_gc=names_gc, cols_gc=cols_gc
   )
   
-  processDsConfiguration(m=xr1, n=yr1, dss=dss, show_ds_info=FALSE,
-                         info=infos[conf],
-                         n_name='nRnd', m_name='mRnd',
-                         power=power_2, power_method='Geometric', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], '2geo_aRandomDSSizes.png'),
-                         width_1=30, height_1=20,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], '2geo_bRandomDSSizeGraph.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], '2geo_cRandomDSSizeCombination.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], '2geo_dRandomDSSizes.csv'),
-                         plot_to_file=plot_to_file, y_transform='identity'
+  processDsConfiguration(
+    m=xr1, n=yr1, dss=dss, show_ds_info=FALSE,
+    info=infos[conf],
+    n_name='nRnd', m_name='mRnd',
+    power=power_2, power_method='Geometric', theta=theta,
+    fig_1_name=paste0(dir_parent, dir_sub[conf], '2geo_aRandomDSSizes.png'),
+    width_1=30, height_1=20,
+    fig_2_name=paste0(dir_parent, dir_sub[conf], '2geo_bRandomDSSizeGraph.png'),
+    fig_3_name=paste0(dir_parent, dir_sub[conf], '2geo_cRandomDSSizeCombination.png'),
+    tab_name=paste0(dir_parent, dir_sub[conf], '2geo_dRandomDSSizes.csv'),
+    plot_to_file=plot_to_file, y_transform='identity',
+    names_gc=names_gc, cols_gc=cols_gc
   )
   
   # 3) mN and nN
@@ -180,28 +203,32 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
   cat(paste0('\n\nConfiguration ', conf, '/', count_conf, ': ', infos[conf], '\n'))
   cat('********************************************************************************\n')
   dss <- paste0(rep('DS', length(mN)), 1:length(mN))
-  processDsConfiguration(m=mN, n=nN, dss=dss, show_ds_info=TRUE,
-                         info=infos[conf],
-                         n_name='mN', m_name='nN',
-                         power=power_1, power_method='Arithmetic', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], '3ari_aBenignDSs.png'),
-                         width_1=30, height_1=15,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], '3ari_bBenignDSsGraph.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], '3ari_cBenignDSCombination.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], '3ari_dBenignDSs.csv'),
-                         plot_to_file=plot_to_file, y_transform='identity'
+  processDsConfiguration(
+    m=mN, n=nN, dss=dss, show_ds_info=TRUE,
+    info=infos[conf],
+    n_name='mN', m_name='nN',
+    power=power_1, power_method='Arithmetic', theta=theta,
+    fig_1_name=paste0(dir_parent, dir_sub[conf], '3ari_aBenignDSs.png'),
+    width_1=30, height_1=15,
+    fig_2_name=paste0(dir_parent, dir_sub[conf], '3ari_bBenignDSsGraph.png'),
+    fig_3_name=paste0(dir_parent, dir_sub[conf], '3ari_cBenignDSCombination.png'),
+    tab_name=paste0(dir_parent, dir_sub[conf], '3ari_dBenignDSs.csv'),
+    plot_to_file=plot_to_file, y_transform='identity',
+    names_gc=names_gc, cols_gc=cols_gc
   )
   
-  processDsConfiguration(m=mN, n=nN, dss=dss, show_ds_info=FALSE,
-                         info=infos[conf],
-                         n_name='mN', m_name='nN',
-                         power=power_2, power_method='Geometric', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], '3geo_aBenignDSs.png'),
-                         width_1=30, height_1=20,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], '3geo_bBenignDSsGraph.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], '3geo_cBenignDSCombination.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], '3geo_dBenignDSs.csv'),
-                         plot_to_file=plot_to_file, y_transform='identity'
+  processDsConfiguration(
+    m=mN, n=nN, dss=dss, show_ds_info=FALSE,
+    info=infos[conf],
+    n_name='mN', m_name='nN',
+    power=power_2, power_method='Geometric', theta=theta,
+    fig_1_name=paste0(dir_parent, dir_sub[conf], '3geo_aBenignDSs.png'),
+    width_1=30, height_1=20,
+    fig_2_name=paste0(dir_parent, dir_sub[conf], '3geo_bBenignDSsGraph.png'),
+    fig_3_name=paste0(dir_parent, dir_sub[conf], '3geo_cBenignDSCombination.png'),
+    tab_name=paste0(dir_parent, dir_sub[conf], '3geo_dBenignDSs.csv'),
+    plot_to_file=plot_to_file, y_transform='identity',
+    names_gc=names_gc, cols_gc=cols_gc
   )
   
   # 4) mP and nP
@@ -209,56 +236,64 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
   cat(paste0('\n\nConfiguration ', conf, '/', count_conf, ': ', infos[conf], '\n'))
   cat('********************************************************************************\n')
   dss <- paste0(rep('DS', length(mP)), 1:length(mP))
-  processDsConfiguration(m=mP, n=nP, dss=dss, show_ds_info=TRUE,
-                         info=infos[conf],
-                         n_name='mP', m_name='nP',
-                         power=power_1, power_method='Arithmetic', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], '4ari_aMalignDSs.png'),
-                         width_1=30, height_1=15,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], '4ari_bMalignDSsGraph.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], '4ari_cMalignDSCombination.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], '4ari_dMalignDSs.csv'),
-                         plot_to_file=plot_to_file, y_transform='log10'
+  processDsConfiguration(
+    m=mP, n=nP, dss=dss, show_ds_info=TRUE,
+    info=infos[conf],
+    n_name='mP', m_name='nP',
+    power=power_1, power_method='Arithmetic', theta=theta,
+    fig_1_name=paste0(dir_parent, dir_sub[conf], '4ari_aMalignDSs.png'),
+    width_1=30, height_1=15,
+    fig_2_name=paste0(dir_parent, dir_sub[conf], '4ari_bMalignDSsGraph.png'),
+    fig_3_name=paste0(dir_parent, dir_sub[conf], '4ari_cMalignDSCombination.png'),
+    tab_name=paste0(dir_parent, dir_sub[conf], '4ari_dMalignDSs.csv'),
+    plot_to_file=plot_to_file, y_transform='log10',
+    names_gc=names_gc, cols_gc=cols_gc
   )
   
-  processDsConfiguration(m=mP, n=nP, dss=dss, show_ds_info=FALSE,
-                         info=infos[conf],
-                         n_name='mP', m_name='nP',
-                         power=power_2, power_method='Geometric', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], '4geo_aMalignDSs.png'),
-                         width_1=30, height_1=20,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], '4geo_bMalignDSsGraph.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], '4geo_cMalignDSCombination.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], '4geo_dMalignDSs.csv'),
-                         plot_to_file=plot_to_file, y_transform='log10'
+  processDsConfiguration(
+    m=mP, n=nP, dss=dss, show_ds_info=FALSE,
+    info=infos[conf],
+    n_name='mP', m_name='nP',
+    power=power_2, power_method='Geometric', theta=theta,
+    fig_1_name=paste0(dir_parent, dir_sub[conf], '4geo_aMalignDSs.png'),
+    width_1=30, height_1=20,
+    fig_2_name=paste0(dir_parent, dir_sub[conf], '4geo_bMalignDSsGraph.png'),
+    fig_3_name=paste0(dir_parent, dir_sub[conf], '4geo_cMalignDSCombination.png'),
+    tab_name=paste0(dir_parent, dir_sub[conf], '4geo_dMalignDSs.csv'),
+    plot_to_file=plot_to_file, y_transform='log10',
+    names_gc=names_gc, cols_gc=cols_gc
   )
   
   # 5) mMalware and nMalware
   conf <- conf + 1
   cat(paste0('\n\nConfiguration ', conf, '/', count_conf, ': ', infos[conf], '\n'))
   cat('********************************************************************************\n')
-  processDsConfiguration(m=mMalware, n=nMalware, dss=DSMs, show_ds_info=TRUE,
-                         info=infos[conf],
-                         n_name='mMalware', m_name='nMalware',
-                         power=power_1, power_method='Arithmetic', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], '5ari_aMalwareFamilyDSs.png'),
-                         width_1=40, height_1=15,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], '5ari_bMalwareFamilyDSsGraph.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], '5ari_cMalwareFamilyDSCombination.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], '5ari_dMalwareFamilyDSs.csv'),
-                         plot_to_file=plot_to_file, y_transform='log10'
+  processDsConfiguration(
+    m=mMalware, n=nMalware, dss=DSMs, show_ds_info=TRUE,
+    info=infos[conf],
+    n_name='mMalware', m_name='nMalware',
+    power=power_1, power_method='Arithmetic', theta=theta,
+    fig_1_name=paste0(dir_parent, dir_sub[conf], '5ari_aMalwareFamilyDSs.png'),
+    width_1=40, height_1=15,
+    fig_2_name=paste0(dir_parent, dir_sub[conf], '5ari_bMalwareFamilyDSsGraph.png'),
+    fig_3_name=paste0(dir_parent, dir_sub[conf], '5ari_cMalwareFamilyDSCombination.png'),
+    tab_name=paste0(dir_parent, dir_sub[conf], '5ari_dMalwareFamilyDSs.csv'),
+    plot_to_file=plot_to_file, y_transform='log10',
+    names_gc=names_gc, cols_gc=cols_gc
   )
   
-  processDsConfiguration(m=mMalware, n=nMalware, dss=DSMs, show_ds_info=FALSE,
-                         info=infos[conf],
-                         n_name='mMalware', m_name='nMalware',
-                         power=power_2, power_method='Geometric', theta=theta,
-                         fig_1_name=paste0(dir_parent, dir_sub[conf], '5geo_aMalwareFamilyDSs.png'),
-                         width_1=40, height_1=20,
-                         fig_2_name=paste0(dir_parent, dir_sub[conf], '5geo_bMalwareFamilyDSsGraph.png'),
-                         fig_3_name=paste0(dir_parent, dir_sub[conf], '5geo_cMalwareFamilyDSCombination.png'),
-                         tab_name=paste0(dir_parent, dir_sub[conf], '5geo_dMalwareFamilyDSs.csv'),
-                         plot_to_file=plot_to_file, y_transform='log10'
+  processDsConfiguration(
+    m=mMalware, n=nMalware, dss=DSMs, show_ds_info=FALSE,
+    info=infos[conf],
+    n_name='mMalware', m_name='nMalware',
+    power=power_2, power_method='Geometric', theta=theta,
+    fig_1_name=paste0(dir_parent, dir_sub[conf], '5geo_aMalwareFamilyDSs.png'),
+    width_1=40, height_1=20,
+    fig_2_name=paste0(dir_parent, dir_sub[conf], '5geo_bMalwareFamilyDSsGraph.png'),
+    fig_3_name=paste0(dir_parent, dir_sub[conf], '5geo_cMalwareFamilyDSCombination.png'),
+    tab_name=paste0(dir_parent, dir_sub[conf], '5geo_dMalwareFamilyDSs.csv'),
+    plot_to_file=plot_to_file, y_transform='log10',
+    names_gc=names_gc, cols_gc=cols_gc
   )
 }
 
@@ -266,13 +301,13 @@ greatnessCategoryTest <- function(power_1=1, power_2=0, theta=1,
 testPlot <- function(power_1=1, power_2=0) {
   # x1 and y1
   dss <- paste0(rep('DS', length(x1)), 1:length(x1))
-  result <- plotGCategoriesZScores(x1, y1, dss,
+  result <- plotTableGCategoriesDetailed(x1, y1, dss,
                                    'Linear sample/feature space with other two extends',
                                    power=power_1)
   wclip(result)
   invisible(readline(prompt=paste('x1 vs. y1 (Arithmetic)',
                                   'Press [enter] to continue')))
-  result <- plotGCategoriesZScores(x1, y1, dss,
+  result <- plotTableGCategoriesDetailed(x1, y1, dss,
                                    'Linear sample/feature space size with other two extends',
                                    power=power_2)
   wclip(result)
@@ -281,13 +316,13 @@ testPlot <- function(power_1=1, power_2=0) {
   
   # xr1 and yr1
   dss <- paste0(rep('DS', length(xr1)), 1:length(xr1))
-  result <- plotGCategoriesZScores(xr1, yr1, dss,
+  result <- plotTableGCategoriesDetailed(xr1, yr1, dss,
                                    'Random sample/feature space size',
                                    power=power_1)
   wclip(result)
   invisible(readline(prompt=paste('xr1 vs. yr1 (Arithmetic)',
                                   'Press [enter] to continue')))
-  result <- plotGCategoriesZScores(xr1, yr1, dss,
+  result <- plotTableGCategoriesDetailed(xr1, yr1, dss,
                                    'Random sample/feature space size',
                                    power=power_2)
   wclip(result)
@@ -296,13 +331,13 @@ testPlot <- function(power_1=1, power_2=0) {
   
   # mN and nN
   dss <- paste0(rep('DS', length(mN)), 1:length(mN))
-  result <- plotGCategoriesZScores(mN, nN, dss,
+  result <- plotTableGCategoriesDetailed(mN, nN, dss,
                                    'Benign (negative-class) software datasets',
                                    power=power_1)
   wclip(result)
   invisible(readline(prompt=paste('mN vs. nN (Arithmetic)',
                                   'Press [enter] to continue')))
-  result <- plotGCategoriesZScores(mN, nN, dss,
+  result <- plotTableGCategoriesDetailed(mN, nN, dss,
                                    'Benign (negative-class) software datasets',
                                    power=power_2)
   wclip(result)
@@ -311,13 +346,13 @@ testPlot <- function(power_1=1, power_2=0) {
   
   # mP and nP
   dss <- paste0(rep('DS', length(mP)), 1:length(mP))
-  result <- plotGCategoriesZScores(mP, nP, dss,
+  result <- plotTableGCategoriesDetailed(mP, nP, dss,
                                    'Malign (positive-class) software datasets',
                                    power=power_1)
   wclip(result)
   invisible(readline(prompt=paste('mP vs. nP (Arithmetic)',
                                   'Press [enter] to continue')))
-  result <- plotGCategoriesZScores(mP, nP, dss,
+  result <- plotTableGCategoriesDetailed(mP, nP, dss,
                                    'Malign (positive-class) software datasets',
                                    power=power_2)
   wclip(result)
@@ -325,13 +360,13 @@ testPlot <- function(power_1=1, power_2=0) {
                                   'Press [enter] to continue')))
   
   # mMalware and nMalware
-  result <- plotGCategoriesZScores(mMalware, nMalware, DSMs,
+  result <- plotTableGCategoriesDetailed(mMalware, nMalware, DSMs,
                                    'Malign (positive-class) software (specialized) datasets',
                                    power=power_1)
   wclip(result)
   invisible(readline(prompt=paste('mP vs. nP (Arithmetic)',
                                   'Press [enter] to continue')))
-  result <- plotGCategoriesZScores(mMalware, nMalware, DSMs,
+  result <- plotTableGCategoriesDetailed(mMalware, nMalware, DSMs,
                                    'Malign (positive-class) software (specialized) datasets',
                                    power=power_2)
   wclip(result)
@@ -342,44 +377,44 @@ testPlot <- function(power_1=1, power_2=0) {
 testDump <- function(power_1=1, power_2=0) {
   # x1 and y1
   dss <- paste0(rep('DS', length(x1)), 1:length(x1))
-  result <- dumpGCategoriesZScores(x1, y1, power=power_1)
+  result <- dumpGCategoriesWithZ(x1, y1, power=power_1)
   wclip(result)
   invisible(readline(prompt=paste('x1 vs. y1 (Arithmetic)',
                                   'Press [enter] to continue')))
-  result <- dumpGCategoriesZScores(x1, y1, power=power_2)
+  result <- dumpGCategoriesWithZ(x1, y1, power=power_2)
   wclip(result)
   invisible(readline(prompt=paste('x1 vs. y1 (Geometric)',
                                   'Press [enter] to continue')))
   
   # xr1 and yr1
   dss <- paste0(rep('DS', length(xr1)), 1:length(xr1))
-  result <- dumpGCategoriesZScores(xr1, yr1, power=power_1)
+  result <- dumpGCategoriesWithZ(xr1, yr1, power=power_1)
   wclip(result)
   invisible(readline(prompt=paste('xr1 vs. yr1 (Arithmetic)',
                                   'Press [enter] to continue')))
-  result <- dumpGCategoriesZScores(xr1, yr1, power=power_2)
+  result <- dumpGCategoriesWithZ(xr1, yr1, power=power_2)
   wclip(result)
   invisible(readline(prompt=paste('xr1 vs. yr1 (Geometric)',
                                   'Press [enter] to continue')))
   
   # mN and nN
   dss <- paste0(rep('DS', length(mN)), 1:length(mN))
-  result <- dumpGCategoriesZScores(mN, nN, power=power_1)
+  result <- dumpGCategoriesWithZ(mN, nN, power=power_1)
   wclip(result)
   invisible(readline(prompt=paste('mN vs. nN (Arithmetic)',
                                   'Press [enter] to continue')))
-  result <- dumpGCategoriesZScores(mN, nN, power=power_2)
+  result <- dumpGCategoriesWithZ(mN, nN, power=power_2)
   wclip(result)
   invisible(readline(prompt=paste('mN vs. nN (Geometric)',
                                   'Press [enter] to continue')))
   
   # mP and nP
   dss <- paste0(rep('DS', length(mP)), 1:length(mP))
-  result <- dumpGCategoriesZScores(mP, nP, power=power_1)
+  result <- dumpGCategoriesWithZ(mP, nP, power=power_1)
   wclip(result)
   invisible(readline(prompt=paste('mP vs. nP (Arithmetic)',
                                   'Press [enter] to continue')))
-  result <- dumpGCategoriesZScores(mP, nP, power=power_2)
+  result <- dumpGCategoriesWithZ(mP, nP, power=power_2)
   wclip(result)
   invisible(readline(prompt=paste('mP vs. nP (Geometric)',
                                   'Press [enter] to continue')))
