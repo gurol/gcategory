@@ -113,10 +113,11 @@ processDsConfiguration <- function(
 
   # Figure: G-Categories with Z-scores of The Combination of The Data Sets
   if (plot_to_file) {
-    png(filename=fig_3_name, width=45, height=20, units='cm', res=300)
+    png(filename=fig_3_name, width=27, height=22, units='cm', res=300)
   }
   
   result <- plotTableGCsOfSpaceSizeCombs(m, n, power=power, theta=theta,
+                                         include_power_mean=TRUE,
                                          names_gc=names_gc, cols_gc=cols_gc)
   
   if (plot_to_file) {
