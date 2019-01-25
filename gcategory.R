@@ -249,12 +249,12 @@ dumpGCategoriesZScores<-function(x, y, power=0, theta=1, na.rm=TRUE,
   GCs <- greatnessCategories(x, y, power=power, theta=theta, na.rm=na.rm,
                              names_gc=names_gc)
   zx <- powerZScores(x, power=power, na.rm=na.rm)
-  zsc_y <- powerZScores(y, power=power, na.rm=na.rm)
+  zy <- powerZScores(y, power=power, na.rm=na.rm)
   
   return(list(
     GCs=t(GCs),
     zx=t(round(zx, round_digit)),
-    zy=t(round(zsc_y, round_digit))))
+    zy=t(round(zy, round_digit))))
 }
 
 plotGCategoriesZScoresSeperated <- function(x, y, DSs, power=0, round_digit=1,
@@ -304,7 +304,7 @@ plotGCategoriesZScoresSeperated <- function(x, y, DSs, power=0, round_digit=1,
   grobGC <- addTitleToGrob(grobGC, 'G-Categories')
 
   zx <- powerZScores(x, power=power, na.rm=na.rm)
-  zsc_y <- powerZScores(y, power=power, na.rm=na.rm)
+  zy <- powerZScores(y, power=power, na.rm=na.rm)
 
   result_zx <- result_ds
   result_zy <- result_ds
@@ -314,7 +314,7 @@ plotGCategoriesZScoresSeperated <- function(x, y, DSs, power=0, round_digit=1,
     zx <- round(zx[which(DSs == ds, arr.ind=TRUE)], round_digit)
     result_zx[which(result_zx == ds, arr.ind=TRUE)] <- zx
 
-    zy <- round(zsc_y[which(DSs == ds, arr.ind=TRUE)], round_digit)
+    zy <- round(zy[which(DSs == ds, arr.ind=TRUE)], round_digit)
     result_zy[which(result_zy == ds, arr.ind=TRUE)] <- zy
 
     if (power == 0) {
@@ -396,23 +396,21 @@ plotGCategoriesZScores <- function(x, y, DSs, info,
   }
   
   zx <- powerZScores(x, power=power, na.rm=na.rm)
-  zsc_y <- powerZScores(y, power=power, na.rm=na.rm)
+  zy <- powerZScores(y, power=power, na.rm=na.rm)
   
   for (ds in DSs) {
     ind <- which(DSs == ds, arr.ind=TRUE)
-    zx <- round(zx[ind], round_digit)
-    zy <- round(zsc_y[ind], round_digit)
     interpret <- ''
     
     if (power == 0) {
       interpret <- paste0(
-        '√(Zm*Zn)=', round(sqrt(zsc_y[ind]*zx[ind]), round_digit),
-        ' (Zn/Zm=', round(zsc_y[ind]/zx[ind], round_digit), ')')
+        '√(Zm*Zn)=', round(sqrt(zy[ind]*zx[ind]), round_digit),
+        ' (Zn/Zm=', round(zy[ind]/zx[ind], round_digit), ')')
     }
     else if (power > 0 && power <= 1) {
       interpret <- paste0(
-        '(Zm+Zn)/2=', round((zsc_y[ind] + zx[ind])/2.0, round_digit),
-        ' (Zn-Zm=', round(zsc_y[ind] - zx[ind], round_digit), ')')
+        '(Zm+Zn)/2=', round((zy[ind] + zx[ind])/2.0, round_digit),
+        ' (Zn-Zm=', round(zy[ind] - zx[ind], round_digit), ')')
     }
     
     inds <- which(result_ds == ds, arr.ind=TRUE)
@@ -420,7 +418,8 @@ plotGCategoriesZScores <- function(x, y, DSs, info,
     more_detailed <- paste0(
       original,
       '\nmxn=', x[ind], ' x ', y[ind],
-      ' ZmxZn=', zx, ' x ', zy,
+      ' ZmxZn=', round(zx[ind], round_digit),
+      ' x ', round(zy[ind], round_digit),
       '\n', interpret
     )
     result[inds] <- more_detailed
@@ -448,9 +447,9 @@ plotGCategoriesZScores <- function(x, y, DSs, info,
                           ', average=', round(mean(zx), 1),
                           ', max=', round(max(zx), 1),
                           '. n (', y_name, ') statistics: min=',
-                          round(min(zsc_y), 1),
-                          ', average=', round(mean(zsc_y), 1),
-                          ', max=', round(max(zsc_y), 1))
+                          round(min(zy), 1),
+                          ', average=', round(mean(zy), 1),
+                          ', max=', round(max(zy), 1))
   )
   
   return (result)
@@ -502,7 +501,8 @@ greatnesCategoriesCombination <- function(x, y, power=0, arrange=TRUE, theta=1,
   
   xx <- as.vector(xx)
   yy <- as.vector(yy)
-  GCs <- greatnessCategories(xx, yy, power=power, theta=theta, na.rm=na.rm, names_gc=names_gc)
+  GCs <- greatnessCategories(xx, yy, power=power, theta=theta, na.rm=na.rm,
+                             names_gc=names_gc)
   
   dim(GCs) <- c(ncol, nrow)
   dimnames(GCs) <- list(x, y)
@@ -540,7 +540,8 @@ dumpAllDSCombinationGCs <- function(x, y, power=0,
   
   xx <- as.vector(xx)
   yy <- as.vector(yy)
-  GCs <- greatnessCategories(x=xx, y=yy, power=power, theta=theta, na.rm=na.rm, names_gc=names_gc)
+  GCs <- greatnessCategories(x=xx, y=yy, power=power, theta=theta, na.rm=na.rm,
+                             names_gc=names_gc)
   
   dim(GCs) <- c(ncol, nrow)
   dimnames(GCs) <- list(x, y)
@@ -550,12 +551,12 @@ dumpAllDSCombinationGCs <- function(x, y, power=0,
   dim(zx) <- c(ncol, nrow)
   dimnames(zx) <- list(x, y)
   
-  zsc_y <- powerZScores(x=yy, power=power, na.rm=na.rm)
+  zy <- powerZScores(x=yy, power=power, na.rm=na.rm)
   
-  dim(zsc_y) <- c(ncol, nrow)
-  dimnames(zsc_y) <- list(x, y)
+  dim(zy) <- c(ncol, nrow)
+  dimnames(zy) <- list(x, y)
   
-  return(list(GCs=t(GCs), zx=t(zx), zy=t(zsc_y)))
+  return(list(GCs=t(GCs), zx=t(zx), zy=t(zy)))
 }
 
 # DSs <- paste0(rep('DS', 6), 0:5)
@@ -784,8 +785,10 @@ plotCombinationAll <- function(x, y, power=0, round_digit=1,
     grobZyZxRatio,
     paste('z-score',
           ifelse(power == 0,
-                 paste0(y_name, '/', x_name, ' (G.Mean = [', x_name, '*', y_name, ']^.5)'),
-                 paste0(y_name, '/', x_name, ' (A.Mean = [', x_name, '+', y_name, ']/2)'))))
+                 paste0(y_name, '/', x_name,
+                        ' (G.Mean = [', x_name, '*', y_name, ']^.5)'),
+                 paste0(y_name, '/', x_name,
+                        ' (A.Mean = [', x_name, '+', y_name, ']/2)'))))
   
   grid.arrange(grobGCs, grobZy,
                grobZx, grobZyZxRatio,
