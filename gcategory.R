@@ -134,7 +134,7 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
     if (is.na(zx) || is.na(zy)) {
       gc_type <- gc_na
     }
-    else if (((theta/2 <= zx || zx <= theta) &&
+    else if (((theta/2 <= zx && zx <= theta) ||
               (theta/2 <= zy && zy <= theta)) ||
              ((zx > theta && zx < 2*theta) &&
               (zy > theta && zy < 2*theta))
@@ -144,7 +144,7 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
     else if (zy > theta && zx > theta) {
       gc_type <- gc_large
     }
-    else if (zy < theta && zx < theta) {
+    else if (zy < (theta/2) && zx < (theta/2)) {
       gc_type <- gc_small
     }
     else if ((zy / zx) > theta) {
@@ -173,7 +173,7 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
     else if (zx > theta_scaled && zy > theta_scaled) {
       gc_type <- gc_large
     }
-    else if (zx < theta_scaled && zy < theta_scaled) {
+    else if (zx < -theta_scaled && zy < -theta_scaled) {
       gc_type <- gc_small
     }
     else if ((zy - zx) > theta_scaled) {
