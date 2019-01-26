@@ -292,7 +292,7 @@ tabulateGCs <- function(
   
   #                  1         2         3
   x_y <- rbind(cbind(paste(x), paste(y), DSs,
-  #                  4           5
+                     #                  4           5
                      result$GCs, paste(result$pmean_zxy)))
   
   if (arrange) {
@@ -365,7 +365,7 @@ plotTableGCs <- function(x, y, DSs, power=0, include_power_mean=FALSE,
     x, y, DSs, power=power, theta=theta,
     include_power_mean=FALSE,
     arrange=arrange, na.rm=na.rm, names_gc=names_gc)
-
+  
   result_pure <- gsub(".+ \\(|\\)", "", result)
   
   cols <- as.table(matrix('white', nrow(result), ncol(result)))
@@ -514,7 +514,7 @@ plotTablesGCsWithZ2x2 <- function(x, y, DSs, power=0, round_digit=1,
   result <- tabulateGCs(
     x, y, DSs, power=power, theta=theta,
     arrange=arrange, na.rm=na.rm, names_gc=names_gc)
-
+  
   # Extract only G-categories
   # "DS2 (skinny)" -> "skinny"
   # result_gc <- gsub("DS.+ \\(|\\)", "", result)
@@ -522,9 +522,9 @@ plotTablesGCsWithZ2x2 <- function(x, y, DSs, power=0, round_digit=1,
   # Extract only Datasets
   # "DS2 (skinny)" -> "skinny"
   result_ds <- gsub(" \\(.+\\)", "", result)
-
+  
   cols <- as.table(matrix('white', nrow(result), ncol(result)))
-
+  
   inds <- which(result_gc == names_gc[gc_small], arr.ind=TRUE)
   cols[inds] <- cols_gc[gc_small]
   inds <- which(result_gc == names_gc[gc_skinny], arr.ind=TRUE)
@@ -535,36 +535,36 @@ plotTablesGCsWithZ2x2 <- function(x, y, DSs, power=0, round_digit=1,
   cols[inds] <- cols_gc[gc_medium]
   inds <- which(result_gc == names_gc[gc_large], arr.ind=TRUE)
   cols[inds] <- cols_gc[gc_large]
-
+  
   fontfaces <- as.table(matrix('plain', nrow(result), ncol(result)))
   if (boldDiagonals) {
     inds <- which(row(result) == col(result), arr.ind=T)
     fontfaces[inds] <- 'bold'
   }
-
+  
   mytheme <- gridExtra::ttheme_minimal(
     core=list(fg_params=list(cex=0.7, fontface=fontfaces),
-                bg_params=list(fill=cols)),
+              bg_params=list(fill=cols)),
     colhead=list(fg_params=list(cex=0.8)),
     rowhead=list(fg_params=list(cex=0.8)))
-
+  
   grobGC <- tableGrob(result, theme=mytheme)
   grobGC <- addTitleToGrob(grobGC, 'G-Categories')
-
+  
   zx <- powerZScores(x, power=power, na.rm=na.rm)
   zy <- powerZScores(y, power=power, na.rm=na.rm)
-
+  
   result_zx <- result_ds
   result_zy <- result_ds
   interpret <- result_ds
-
+  
   for (ds in DSs) {
     zx_value <- round(zx[which(DSs == ds, arr.ind=TRUE)], round_digit)
     result_zx[which(result_zx == ds, arr.ind=TRUE)] <- zx_value
-
+    
     zy_value <- round(zy[which(DSs == ds, arr.ind=TRUE)], round_digit)
     result_zy[which(result_zy == ds, arr.ind=TRUE)] <- zy_value
-
+    
     if (power == 0) {
       interpret[which(interpret == ds, arr.ind=TRUE)] <- paste(
         round(sqrt(zy_value/zx_value), round_digit),
@@ -576,17 +576,17 @@ plotTablesGCsWithZ2x2 <- function(x, y, DSs, power=0, round_digit=1,
         '(', round((zy_value + zx_value)/2.0, round_digit), ')')
     }
   }
-
+  
   x_name <- deparse(substitute(x))
-
+  
   grobZx <- tableGrob(result_zx, theme=mytheme)
   grobZx <- addTitleToGrob(grobZx, paste0('z-score (', x_name, ')'))
-
+  
   y_name <- deparse(substitute(y))
-
+  
   grobZy <- tableGrob(result_zy, theme=mytheme)
   grobZy <- addTitleToGrob(grobZy, paste0('z-score (', y_name, ')'))
-
+  
   grobZyZxRatio <- tableGrob(interpret, theme=mytheme)
   grobZyZxRatio <- addTitleToGrob(
     grobZyZxRatio,
@@ -596,7 +596,7 @@ plotTablesGCsWithZ2x2 <- function(x, y, DSs, power=0, round_digit=1,
                         ' (G.Mean = [', x_name, '*', y_name, ']^.5)'),
                  paste0(y_name, '/', x_name,
                         ' (A.Mean = [', x_name, '+', y_name, ']/2)'))))
-
+  
   grid.arrange(
     grobGC, grobZy, grobZx, grobZyZxRatio, ncol=2, nrow=2,
     layout_matrix=rbind(c(1, 2),
@@ -807,10 +807,10 @@ plotTableGCsOfSpaceSizeCombs <- function(
   }
   
   mytheme <- gridExtra::ttheme_minimal(
-    core=list(fg_params=list(cex=0.9, fontface=fontfaces),
+    core=list(fg_params=list(cex=0.8, fontface=fontfaces),
               bg_params=list(fill=cols)),
-    colhead=list(fg_params=list(cex=1.0)),
-    rowhead=list(fg_params=list(cex=1.0)))
+    colhead=list(fg_params=list(cex=1)),
+    rowhead=list(fg_params=list(cex=0.9)))
   
   if (include_power_mean) {
     GCs <- matrix(paste(GCs, round(result$pmean_zxy, round_digit),
@@ -824,14 +824,14 @@ plotTableGCsOfSpaceSizeCombs <- function(
   grid.arrange(grobGCs,
                ncol=1, nrow=1,
                top=paste0('G-Categories of Data Sets with m (', length(x),
-                         ') x ', 'n (', length(y), ') Combinations\nvia ',
-                         powerMeanTypes(power)))
+                          ') x ', 'n (', length(y), ') Combinations\nvia ',
+                          powerMeanTypes(power)))
 }
 
 plotTablesGCsOfSpaceSizeCombs2x2 <- function(x, y, power=0, round_digit=1,
-                               arrange=TRUE, theta=1, na.rm=TRUE,
-                               boldDiagonals=FALSE,
-                               names_gc=gc.names, cols_gc=gc.cols)
+                                             arrange=TRUE, theta=1, na.rm=TRUE,
+                                             boldDiagonals=FALSE,
+                                             names_gc=gc.names, cols_gc=gc.cols)
 {
   result <- dumpGCsOfSpaceSizeCombs(x, y, power=power, arrange=arrange,
                                     theta=theta, na.rm=na.rm, names_gc=names_gc)
@@ -858,7 +858,7 @@ plotTablesGCsOfSpaceSizeCombs2x2 <- function(x, y, power=0, round_digit=1,
   
   mytheme <- gridExtra::ttheme_minimal(
     core=list(fg_params=list(cex=0.6, fontface=fontfaces),
-                bg_params=list(fill=cols)),
+              bg_params=list(fill=cols)),
     colhead=list(fg_params=list(cex=0.7)),
     rowhead=list(fg_params=list(cex=0.7)))
   

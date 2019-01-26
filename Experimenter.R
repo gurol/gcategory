@@ -70,7 +70,7 @@ processDsConfiguration <- function(
     ifelse(power==0,
            ' (correct) approach.\n   See the files having "geo" in their names.\n',
            ' (erroneous) approach.\n   See the files having "ari" in their names.\n'
-           )))
+    )))
   
   if (plot_to_file) {
     png(filename=fig_1_name, width=width_1, height=height_1, units='cm', res=300)
@@ -102,7 +102,7 @@ processDsConfiguration <- function(
                      '\nCalculated via', powerMeanTypes(power),
                      ifelse(y_transform == 'log10',
                             'sample space is drawn in logarithmic scale', '')
-                     ),
+      ),
       names_gc=names_gc, cols_gc=cols_gc
     )
   )
@@ -110,10 +110,10 @@ processDsConfiguration <- function(
   if (plot_to_file) {
     dev.off()
   }
-
+  
   # Figure: G-Categories with Z-scores of The Combination of The Data Sets
   if (plot_to_file) {
-    png(filename=fig_3_name, width=27, height=22, units='cm', res=300)
+    png(filename=fig_3_name, width=27, height=20, units='cm', res=300)
   }
   
   result <- plotTableGCsOfSpaceSizeCombs(m, n, power=power, theta=theta,
@@ -303,14 +303,14 @@ testPlot <- function(power_1=1, power_2=0) {
   # x1 and y1
   dss <- paste0(rep('DS', length(x1)), 1:length(x1))
   result <- plotTableGCategoriesDetailed(x1, y1, dss,
-                                   'Linear sample/feature space with other two extends',
-                                   power=power_1)
+                                         'Linear sample/feature space with other two extends',
+                                         power=power_1)
   wclip(result)
   invisible(readline(prompt=paste('x1 vs. y1 (Arithmetic)',
                                   'Press [enter] to continue')))
   result <- plotTableGCategoriesDetailed(x1, y1, dss,
-                                   'Linear sample/feature space size with other two extends',
-                                   power=power_2)
+                                         'Linear sample/feature space size with other two extends',
+                                         power=power_2)
   wclip(result)
   invisible(readline(prompt=paste('x1 vs. y1 (Geometric)',
                                   'Press [enter] to continue')))
@@ -318,14 +318,14 @@ testPlot <- function(power_1=1, power_2=0) {
   # xr1 and yr1
   dss <- paste0(rep('DS', length(xr1)), 1:length(xr1))
   result <- plotTableGCategoriesDetailed(xr1, yr1, dss,
-                                   'Random sample/feature space size',
-                                   power=power_1)
+                                         'Random sample/feature space size',
+                                         power=power_1)
   wclip(result)
   invisible(readline(prompt=paste('xr1 vs. yr1 (Arithmetic)',
                                   'Press [enter] to continue')))
   result <- plotTableGCategoriesDetailed(xr1, yr1, dss,
-                                   'Random sample/feature space size',
-                                   power=power_2)
+                                         'Random sample/feature space size',
+                                         power=power_2)
   wclip(result)
   invisible(readline(prompt=paste('xr1 vs. yr1 (Geometric)',
                                   'Press [enter] to continue')))
@@ -333,14 +333,14 @@ testPlot <- function(power_1=1, power_2=0) {
   # mN and nN
   dss <- paste0(rep('DS', length(mN)), 1:length(mN))
   result <- plotTableGCategoriesDetailed(mN, nN, dss,
-                                   'Benign (negative-class) software datasets',
-                                   power=power_1)
+                                         'Benign (negative-class) software datasets',
+                                         power=power_1)
   wclip(result)
   invisible(readline(prompt=paste('mN vs. nN (Arithmetic)',
                                   'Press [enter] to continue')))
   result <- plotTableGCategoriesDetailed(mN, nN, dss,
-                                   'Benign (negative-class) software datasets',
-                                   power=power_2)
+                                         'Benign (negative-class) software datasets',
+                                         power=power_2)
   wclip(result)
   invisible(readline(prompt=paste('mN vs. nN (Geometric)',
                                   'Press [enter] to continue')))
@@ -348,28 +348,28 @@ testPlot <- function(power_1=1, power_2=0) {
   # mP and nP
   dss <- paste0(rep('DS', length(mP)), 1:length(mP))
   result <- plotTableGCategoriesDetailed(mP, nP, dss,
-                                   'Malign (positive-class) software datasets',
-                                   power=power_1)
+                                         'Malign (positive-class) software datasets',
+                                         power=power_1)
   wclip(result)
   invisible(readline(prompt=paste('mP vs. nP (Arithmetic)',
                                   'Press [enter] to continue')))
   result <- plotTableGCategoriesDetailed(mP, nP, dss,
-                                   'Malign (positive-class) software datasets',
-                                   power=power_2)
+                                         'Malign (positive-class) software datasets',
+                                         power=power_2)
   wclip(result)
   invisible(readline(prompt=paste('mP vs. nP (Geometric)',
                                   'Press [enter] to continue')))
   
   # mMalware and nMalware
   result <- plotTableGCategoriesDetailed(mMalware, nMalware, DSMs,
-                                   'Malign (positive-class) software (specialized) datasets',
-                                   power=power_1)
+                                         'Malign (positive-class) software (specialized) datasets',
+                                         power=power_1)
   wclip(result)
   invisible(readline(prompt=paste('mP vs. nP (Arithmetic)',
                                   'Press [enter] to continue')))
   result <- plotTableGCategoriesDetailed(mMalware, nMalware, DSMs,
-                                   'Malign (positive-class) software (specialized) datasets',
-                                   power=power_2)
+                                         'Malign (positive-class) software (specialized) datasets',
+                                         power=power_2)
   wclip(result)
   invisible(readline(prompt=paste('mP vs. nP (Geometric)',
                                   'Press [enter] to continue')))
