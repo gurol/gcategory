@@ -455,7 +455,7 @@ plotTableGCsDetailed <- function(x, y, DSs, info,
     
     if (power == 0) {
       interpret <- paste0(
-        '√(zm.zn)=', round(sqrt(zy[ind]*zx[ind]), round_digit),
+        '√(zm·zn)=', round(sqrt(zy[ind]*zx[ind]), round_digit),
         ' (zn/zm=', round(zy[ind]/zx[ind], round_digit), ')')
     }
     else if (power > 0 && power <= 1) {
@@ -468,9 +468,9 @@ plotTableGCsDetailed <- function(x, y, DSs, info,
     original <- result[inds]
     more_detailed <- paste0(
       original,
-      '\nmxn=', x[ind], ' x ', y[ind],
-      ' ZmxZn=', round(zx[ind], round_digit),
-      ' x ', round(zy[ind], round_digit),
+      '\nm·n=', x[ind], '·', y[ind],
+      ' zm·zn=', round(zx[ind], round_digit),
+      '·', round(zy[ind], round_digit),
       '\n', interpret
     )
     result[inds] <- more_detailed
