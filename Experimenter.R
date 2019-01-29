@@ -53,7 +53,7 @@ processDsConfiguration <- function(
   fig_2_name, fig_3_name,
   tab_name,
   plot_to_file, y_transform,
-  names_gc=gc.names, cols_gc=gc.cols) {
+  names_gc=gc.names, cols_gc=gc.cols, csv_seperator=',') {
   # Display information about the data sets
   if (show_ds_info) {
     cat(paste0(
@@ -85,7 +85,7 @@ processDsConfiguration <- function(
   if (plot_to_file) {
     # Tabular Data: G-Categories with Z-scores
     write.table(result, file=tab_name,
-                sep=',', dec='.', row.names=TRUE, col.names=NA,
+                sep=csv_seperator, dec='.', row.names=TRUE, col.names=NA,
                 fileEncoding="UTF-8")
   }
   
@@ -127,7 +127,8 @@ processDsConfiguration <- function(
 
 testGreatnessCategory <- function(power_1=1, power_2=0, theta=1,
                                   names_gc=gc.names, cols_gc=gc.cols,
-                                  plot_to_file=FALSE, dir_parent='../results/') {
+                                  plot_to_file=FALSE, dir_parent='../results/',
+                                  csv_seperator=',') {
   if (exists('x1') == FALSE) {
     loadTestData()
   }
@@ -149,7 +150,7 @@ testGreatnessCategory <- function(power_1=1, power_2=0, theta=1,
     fig_3_name=paste0(dir_parent, dir_sub[conf], '1ari_cLinearDSSizeCombination.png'),
     tab_name=paste0(dir_parent, dir_sub[conf], '1ari_dLinearDSSizes.csv'),
     plot_to_file=plot_to_file, y_transform='identity',
-    names_gc=names_gc, cols_gc=cols_gc
+    names_gc=names_gc, cols_gc=cols_gc, csv_seperator=csv_seperator
   )
   
   processDsConfiguration(
@@ -163,7 +164,7 @@ testGreatnessCategory <- function(power_1=1, power_2=0, theta=1,
     fig_3_name=paste0(dir_parent, dir_sub[conf], '1geo_cLinearDSSizeCombination.png'),
     tab_name=paste0(dir_parent, dir_sub[conf], '1geo_dLinearDSSizes.csv'),
     plot_to_file=plot_to_file, y_transform='identity',
-    names_gc=names_gc, cols_gc=cols_gc
+    names_gc=names_gc, cols_gc=cols_gc, csv_seperator=csv_seperator
   )
   
   # 2) xr1 and yr1
@@ -182,7 +183,7 @@ testGreatnessCategory <- function(power_1=1, power_2=0, theta=1,
     fig_3_name=paste0(dir_parent, dir_sub[conf], '2ari_cRandomDSSizeCombination.png'),
     tab_name=paste0(dir_parent, dir_sub[conf], '2ari_dRandomDSSizes.csv'),
     plot_to_file=plot_to_file, y_transform='identity',
-    names_gc=names_gc, cols_gc=cols_gc
+    names_gc=names_gc, cols_gc=cols_gc, csv_seperator=csv_seperator
   )
   
   processDsConfiguration(
@@ -196,7 +197,7 @@ testGreatnessCategory <- function(power_1=1, power_2=0, theta=1,
     fig_3_name=paste0(dir_parent, dir_sub[conf], '2geo_cRandomDSSizeCombination.png'),
     tab_name=paste0(dir_parent, dir_sub[conf], '2geo_dRandomDSSizes.csv'),
     plot_to_file=plot_to_file, y_transform='identity',
-    names_gc=names_gc, cols_gc=cols_gc
+    names_gc=names_gc, cols_gc=cols_gc, csv_seperator=csv_seperator
   )
   
   # 3) mN and nN
@@ -215,7 +216,7 @@ testGreatnessCategory <- function(power_1=1, power_2=0, theta=1,
     fig_3_name=paste0(dir_parent, dir_sub[conf], '3ari_cBenignDSCombination.png'),
     tab_name=paste0(dir_parent, dir_sub[conf], '3ari_dBenignDSs.csv'),
     plot_to_file=plot_to_file, y_transform='identity',
-    names_gc=names_gc, cols_gc=cols_gc
+    names_gc=names_gc, cols_gc=cols_gc, csv_seperator=csv_seperator
   )
   
   processDsConfiguration(
@@ -229,7 +230,7 @@ testGreatnessCategory <- function(power_1=1, power_2=0, theta=1,
     fig_3_name=paste0(dir_parent, dir_sub[conf], '3geo_cBenignDSCombination.png'),
     tab_name=paste0(dir_parent, dir_sub[conf], '3geo_dBenignDSs.csv'),
     plot_to_file=plot_to_file, y_transform='identity',
-    names_gc=names_gc, cols_gc=cols_gc
+    names_gc=names_gc, cols_gc=cols_gc, csv_seperator=csv_seperator
   )
   
   # 4) mP and nP
@@ -248,7 +249,7 @@ testGreatnessCategory <- function(power_1=1, power_2=0, theta=1,
     fig_3_name=paste0(dir_parent, dir_sub[conf], '4ari_cMalignDSCombination.png'),
     tab_name=paste0(dir_parent, dir_sub[conf], '4ari_dMalignDSs.csv'),
     plot_to_file=plot_to_file, y_transform='log10',
-    names_gc=names_gc, cols_gc=cols_gc
+    names_gc=names_gc, cols_gc=cols_gc, csv_seperator=csv_seperator
   )
   
   processDsConfiguration(
@@ -262,7 +263,7 @@ testGreatnessCategory <- function(power_1=1, power_2=0, theta=1,
     fig_3_name=paste0(dir_parent, dir_sub[conf], '4geo_cMalignDSCombination.png'),
     tab_name=paste0(dir_parent, dir_sub[conf], '4geo_dMalignDSs.csv'),
     plot_to_file=plot_to_file, y_transform='log10',
-    names_gc=names_gc, cols_gc=cols_gc
+    names_gc=names_gc, cols_gc=cols_gc, csv_seperator=csv_seperator
   )
   
   # 5) mMalware and nMalware
@@ -280,7 +281,7 @@ testGreatnessCategory <- function(power_1=1, power_2=0, theta=1,
     fig_3_name=paste0(dir_parent, dir_sub[conf], '5ari_cMalwareFamilyDSCombination.png'),
     tab_name=paste0(dir_parent, dir_sub[conf], '5ari_dMalwareFamilyDSs.csv'),
     plot_to_file=plot_to_file, y_transform='log10',
-    names_gc=names_gc, cols_gc=cols_gc
+    names_gc=names_gc, cols_gc=cols_gc, csv_seperator=csv_seperator
   )
   
   processDsConfiguration(
@@ -294,7 +295,7 @@ testGreatnessCategory <- function(power_1=1, power_2=0, theta=1,
     fig_3_name=paste0(dir_parent, dir_sub[conf], '5geo_cMalwareFamilyDSCombination.png'),
     tab_name=paste0(dir_parent, dir_sub[conf], '5geo_dMalwareFamilyDSs.csv'),
     plot_to_file=plot_to_file, y_transform='log10',
-    names_gc=names_gc, cols_gc=cols_gc
+    names_gc=names_gc, cols_gc=cols_gc, csv_seperator=csv_seperator
   )
 }
 
