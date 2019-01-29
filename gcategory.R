@@ -775,6 +775,25 @@ dumpGCsOfSpaceSizeCombs <- function(x, y, power=0, theta=1,
   return(list(GCs=t(GCs), zx=t(zx), zy=t(zy), pmean_zxy=t(pmean_zxy)))
 }
 
+tabulateGCsOfSpaceSizeCombs <- function(
+  x, y, power=0, theta=1, include_power_mean=FALSE,
+  round_digit=1, arrange=TRUE, na.rm=TRUE,
+  names_gc=gc.names
+)
+{
+  result <- dumpGCsOfSpaceSizeCombs(
+    x, y, power=power, arrange=arrange,
+    theta=theta, na.rm=na.rm, names_gc=names_gc)
+  GCs <- result$GCs
+  
+  if (include_power_mean) {
+    GCs <- matrix(paste(GCs, round(result$pmean_zxy, round_digit),
+                        sep=", "), nrow=nrow(GCs), ncol=ncol(GCs),
+                  dimnames=dimnames(GCs))
+  }
+  
+}
+
 plotTableGCsOfSpaceSizeCombs <- function(
   x, y, power=0, theta=1, include_power_mean=FALSE,
   round_digit=1, arrange=TRUE, na.rm=TRUE,

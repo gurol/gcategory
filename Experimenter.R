@@ -123,8 +123,19 @@ processDsConfiguration <- function(
   if (plot_to_file) {
     dev.off()
   }
+  
+  if (plot_to_file) {
+    result <- tabulateGCsOfSpaceSizeCombs(m, n, power=power, theta=theta,
+                                           include_power_mean=TRUE,
+                                           names_gc=names_gc)
+    # Tabular Data: G-Categories with G-C factor
+    write.table(result, file=gsub('_d', '_e', gsub('s.csv', 'Combination.csv', tab_name)),
+                sep=csv_seperator, dec='.', row.names=TRUE, col.names=NA,
+                fileEncoding="UTF-8")
+  }
 }
 
+# testGreatnessCategory(plot_to_file=TRUE, csv_seperator=';')
 testGreatnessCategory <- function(power_1=1, power_2=0, theta=1,
                                   names_gc=gc.names, cols_gc=gc.cols,
                                   plot_to_file=FALSE, dir_parent='../results/',
