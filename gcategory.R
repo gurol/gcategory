@@ -107,16 +107,15 @@ gc.cols.bw <- c(
 #' x1 <- c(1:11)
 #' y1 <- seq(110, 10, -10)
 #' greatnessCategory(1, x1, y1, power=0)
-#' greatnessCategory(1, x1, y1, power=1)
+#' greatnessCategory(1, x1, y1, power=1, theta=log(2))
 #' @note The method is proposed by Gürol Canbek. See the reference for citation.
 greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
-                              power_stat_x=NULL,
-                              power_stat_y=NULL,
+                              power_stat_x=NULL, power_stat_y=NULL,
                               names_gc=gc.names)
 {
   if (is.na(x[i]))
     return ('NA')
-  
+
   if (TRUE == is.null(power_stat_x)) {
     power_stat_x <- powerStatistics(x, power=power, na.rm=na.rm)
   }
@@ -159,27 +158,26 @@ greatnessCategory <- function(i, x, y, power=0, theta=1, na.rm=TRUE,
     }
   }
   else if (power > 0 && power <= 1) {
-    theta_scaled <- theta*log(2)
     if (is.na(zx) || is.na(zy)) {
       gc_type <- gc_na
     }
     else if (
-      (abs(zx) <= theta_scaled || abs(zy) <= theta_scaled) ||
-      ((zx > theta_scaled && zx < 2*theta_scaled) &&
-       (zy > theta_scaled && zy < 2*theta_scaled))
+      (abs(zx) <= theta || abs(zy) <= theta) ||
+      ((zx > theta && zx < 2*theta) &&
+       (zy > theta && zy < 2*theta))
     ) {
       gc_type <- gc_medium
     }
-    else if (zx > theta_scaled && zy > theta_scaled) {
+    else if (zx > theta && zy > theta) {
       gc_type <- gc_large
     }
-    else if (zx < -theta_scaled && zy < -theta_scaled) {
+    else if (zx < -theta && zy < -theta) {
       gc_type <- gc_small
     }
-    else if ((zy - zx) > theta_scaled) {
+    else if ((zy - zx) > theta) {
       gc_type <- gc_skinny
     }
-    else if ((zx - zy) > theta_scaled) {
+    else if ((zx - zy) > theta) {
       gc_type <- gc_shallow
     }
     else {
