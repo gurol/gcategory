@@ -1,5 +1,8 @@
 source('gcategory.R')
 
+# In Excel
+# dot operators (⋅) may be seen as ¬∑
+# square root operators (√) may be seen as ‚àö
 infos <- c(
   'Linear sample/feature space with other two extends', # 1
   'Random sample/feature space sizes', # 2
@@ -262,7 +265,7 @@ testGreatnessCategory <- function(power_1=1, power_2=0,
   cat(paste0('\n\nConfiguration ', conf, '/', count_conf, ': ', infos[conf],
              '\n'))
   cat('*********************************************************************\n')
-  dss <- paste0(rep('DS', length(mP)), 1:(length(mP)-1))
+  dss <- paste0(rep('DS', length(mP)), 0:(length(mP)-1))
   processDsConfiguration(
     m=mP, n=nP, dss=dss, show_ds_info=TRUE,
     info=infos[conf],
