@@ -1,7 +1,7 @@
 ## A Research Compedium of
 # G-Category: A novel method to quantifying and categorizing data sets
 
-[![Last-changedate](https://img.shields.io/badge/last%20change-2019--01--31-brightgreen.svg)](https://github.com/gurol/gcategory) [![Licence](https://img.shields.io/hexpm/l/plug.svg)](http://choosealicense.com/licenses/apache-2.0/)  [![ORCiD](https://img.shields.io/badge/ORCiD-0000--0002--9337--097X-green.svg)](https://orcid.org/0000-0002-9337-097X)
+[![Last-changedate](https://img.shields.io/badge/last%20change-2019--02--07-brightgreen.svg)](https://github.com/gurol/gcategory) [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)  [![ORCiD](https://img.shields.io/badge/ORCiD-0000--0002--9337--097X-green.svg)](https://orcid.org/0000-0002-9337-097X)
 
 This platform is an interactive research compedium of our academic publication below.
 
