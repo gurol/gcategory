@@ -5,7 +5,7 @@
 
 This platform is an interactive research compedium of our academic publication below.
 
-> [Gürol Canbek](http:gurol.canbek.com/Publications), Seref Sagiroglu, and Tugba Taskaya Temizel. (2019). G-Category: A novel method to quantifying and categorizing data sets. *Journal of Machine Learning Research*, Submitted
+> [Gürol Canbek](http:gurol.canbek.com/Publications), Seref Sagiroglu, and Tugba Taskaya Temizel. (2019). G-Category: A novel method to quantifying and categorizing data sets. *Journal of Machine Learning Research* (Submitted).
 
 The platform provides ready-to-run open-source R scripts for the new method called G-Category (Greatness Category). The method is proposed in the article above to categorize the sizes of a group of data sets in two dimensions: sample space and feature space. The G-Categories are small, medium, shallow, skinny, and large. An experimenter is prepared to test the G-Category method in example synthetic (linear and random size distributions) and the real data sets found in the literature.
 
