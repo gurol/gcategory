@@ -9,6 +9,8 @@ This platform is an interactive research compedium of my academic publication be
 
 The platform provides ready-to-run open-source R scripts for the new method called G-Category (Greatness Category). The method is proposed in the article above to categorize the sizes of a group of data sets in two dimensions: sample space and feature space. The G-Categories are small, medium, shallow, skinny, and large. An experimenter is prepared to test the G-Category method in example synthetic (linear and random size distributions) and the real data sets found in the literature.
 
+![GCategory](https://user-images.githubusercontent.com/14318443/178964709-087b2b5a-11a4-40dd-96fd-1adf7af094a2.png)
+
 The results are given for two approaches: pure geometric (correct) approach and pure arithmetic (erroneous) approach to see the difference. Refer to the article for more information.
 
 **Note**: Please, cite my article if you would like to use and/or adapt the code, datasets, methodology, and other materials provided and [let us know](mailto:gurol@canbek.com?subject=G-category). Thank you for your interest.
