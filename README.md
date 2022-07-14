@@ -1,17 +1,17 @@
 ## A Research Compedium of
 # G-Category: A novel method to quantifying and categorizing data sets
 
-[![Last-changedate](https://img.shields.io/badge/last%20change-2019--02--07-brightgreen.svg)](https://github.com/gurol/gcategory) [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)  [![ORCiD](https://img.shields.io/badge/ORCiD-0000--0002--9337--097X-green.svg)](https://orcid.org/0000-0002-9337-097X)
+[![Last-changedate](https://img.shields.io/badge/last%20change-2022--07--13-brightgreen.svg)](https://github.com/gurol/gcategory) [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)  [![ORCiD](https://img.shields.io/badge/ORCiD-0000--0002--9337--097X-green.svg)](https://orcid.org/0000-0002-9337-097X)
 
-This platform is an interactive research compedium of our academic publication below.
+This platform is an interactive research compedium of my academic publication below.
 
-> [Gürol Canbek](http:gurol.canbek.com/Publications), Seref Sagiroglu, and Tugba Taskaya Temizel. (2019). G-Category: A novel method to quantifying and categorizing data sets. *Journal of Machine Learning Research* (Submitted).
+> [Gürol Canbek](http:gurol.canbek.com) (2022). G-Category: A novel method to quantifying and categorizing data sets. *Journal of Machine Learning Research* (To be submitted).
 
 The platform provides ready-to-run open-source R scripts for the new method called G-Category (Greatness Category). The method is proposed in the article above to categorize the sizes of a group of data sets in two dimensions: sample space and feature space. The G-Categories are small, medium, shallow, skinny, and large. An experimenter is prepared to test the G-Category method in example synthetic (linear and random size distributions) and the real data sets found in the literature.
 
 The results are given for two approaches: pure geometric (correct) approach and pure arithmetic (erroneous) approach to see the difference. Refer to the article for more information.
 
-**Note**: Please, cite our article if you would like to use and/or adapt the code, datasets, methodology, and other materials provided and [let us know](mailto:gurol@canbek.com?subject=G-category). Thank you for your interest.
+**Note**: Please, cite my article if you would like to use and/or adapt the code, datasets, methodology, and other materials provided and [let us know](mailto:gurol@canbek.com?subject=G-category). Thank you for your interest.
 
 Skip to Quick Start section below to learn how to use this platform.
 
@@ -110,4 +110,4 @@ The original code repository and future updates can be found at [https://github.
                                              approach)
 ```
 
-Copyright (C) 2017-2018 Gürol Canbek
+Copyright (C) 2017-2022 Gürol Canbek
